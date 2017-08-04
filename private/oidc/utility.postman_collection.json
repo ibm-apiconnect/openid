@@ -8,16 +8,100 @@
 	},
 	"item": [
 		{
-			"name": "ConsumerAPIAdvancedScopeCheck",
+			"name": "Hello.....",
 			"request": {
-				"url": "{{url}}/api/scope-check",
+				"url": "{{url}}/ping",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Basic Authentication",
+			"request": {
+				"url": "{{url}}/basic-auth/{{username}}/{{password}}",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Basic c3Bvb246c3Bvb24=",
+						"description": ""
+					}
+				],
+				"body": {},
+				"description": "/{username}/{password}\nChoose your username & password"
+			},
+			"response": []
+		},
+		{
+			"name": "IdentiyExtractRedirectRedirect-1of2",
+			"request": {
+				"url": {
+					"raw": "{{url}}/identity-extract/redirect?app-name=SpoonApp&original-url=https://whatever.com&rstate=apicrstate",
+					"protocol": "{{url}}/identity-extract/redirect?app-name=SpoonApp&original-url=https",
+					"host": [
+						"whatever",
+						"com&rstate=apicrstate"
+					],
+					"query": [
+						{
+							"key": "app-name",
+							"value": "SpoonApp",
+							"equals": true,
+							"description": ""
+						},
+						{
+							"key": "original-url",
+							"value": "https://whatever.com",
+							"equals": true,
+							"description": ""
+						},
+						{
+							"key": "rstate",
+							"value": "apicrstate",
+							"equals": true,
+							"description": ""
+						}
+					],
+					"variable": []
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": "This is the beginning of the support for 3rd party Identity Provider..\nIdentity : redirect\nAuthorization : authenticate-url\n^^^ This is the Identity"
+			},
+			"response": []
+		},
+		{
+			"name": "IdentiyExtractRedirectAuthenticate-2of2",
+			"request": {
+				"url": "{{url}}/identity-extract/redirect/authenticate",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Basic c3Bvb246b3phaXI=",
+						"description": ""
+					}
+				],
+				"body": {},
+				"description": "This supports the authenticate portion of the 3rd party Identity Provider.\nIdentity : redirect\nAuthenticate : url \nThis is the `Authenticate` portion of the above"
+			},
+			"response": []
+		},
+		{
+			"name": "OAuthProviderAdvancedApplicationScope",
+			"request": {
+				"url": "{{url}}/provider/scope-check/application",
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"token_scope\":\"here I am\"}"
+					"raw": "{\"token_scope\":\"abc\"}"
 				},
-				"description": "This supports the consumer api advanced scope check"
+				"description": "This supports OAuth Provider Advanced Application Scope Check"
 			},
 			"response": []
 		},
@@ -36,23 +120,23 @@
 			"response": []
 		},
 		{
-			"name": "OAuthProviderAdvancedApplicationScopeCheck",
+			"name": "ConsumerAPIAdvancedScopeCheck",
 			"request": {
-				"url": "{{url}}/provider/scope-check/application",
+				"url": "{{url}}/api/scope-check",
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"token_scope\":\"abc\"}"
+					"raw": "{\"token_scope\":\"here I am\"}"
 				},
-				"description": "This supports OAuth Provider Advanced Application Scope Check"
+				"description": "This supports the consumer api advanced scope check"
 			},
 			"response": []
 		},
 		{
-			"name": "IntrospectProxy",
+			"name": "IntrospectW3rdParty-Active",
 			"request": {
-				"url": "{{url}}/third-party-oauth/introspect/proxy",
+				"url": "{{url}}/third-party-oauth/introspect",
 				"method": "POST",
 				"header": [
 					{
@@ -77,18 +161,18 @@
 						},
 						{
 							"key": "token",
-							"value": "token-to-be-proxyed",
+							"value": "access-token-from-third-party-oauth-provider",
 							"description": "",
 							"type": "text"
 						}
 					]
 				},
-				"description": "This shows how to proxying an introspection call from APIc to 3rd party OAuth introspectio endpoint.  One of the main reason is because of 3rd party may need a different Basic Authorization Header credential for validate the request."
+				"description": "This acts as 3rd party OAuth introspect services, in reality, this is Ping, ISAM or ..."
 			},
 			"response": []
 		},
 		{
-			"name": "Pseudo3rdPartyOAuthIntrospect",
+			"name": "IntrospectW3rdParty-Inactive",
 			"request": {
 				"url": "{{url}}/third-party-oauth/introspect",
 				"method": "POST",
@@ -131,9 +215,9 @@
 			"response": []
 		},
 		{
-			"name": "IntrospectSupportFor3Party",
+			"name": "IntrospectW3rdParty-Proxy",
 			"request": {
-				"url": "{{url}}/third-party-oauth/introspect",
+				"url": "{{url}}/third-party-oauth/introspect/proxy",
 				"method": "POST",
 				"header": [
 					{
@@ -158,13 +242,13 @@
 						},
 						{
 							"key": "token",
-							"value": "access-token-from-third-party-oauth-provider",
+							"value": "token-to-be-proxyed",
 							"description": "",
 							"type": "text"
 						}
 					]
 				},
-				"description": "This acts as 3rd party OAuth introspect services, in reality, this is Ping, ISAM or ..."
+				"description": "This shows how to proxying an introspection call from APIc to 3rd party OAuth introspectio endpoint.  One of the main reason is because of 3rd party may need a different Basic Authorization Header credential for validate the request."
 			},
 			"response": []
 		},
@@ -194,90 +278,6 @@
 			"name": "Metadata URL endpoint",
 			"request": {
 				"url": "{{url}}/metadata-url",
-				"method": "GET",
-				"header": [],
-				"body": {},
-				"description": ""
-			},
-			"response": []
-		},
-		{
-			"name": "IdentiyExtractRedirectAuthenticate",
-			"request": {
-				"url": "{{url}}/identity-extract/redirect/authenticate",
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Basic c3Bvb246b3phaXI=",
-						"description": ""
-					}
-				],
-				"body": {},
-				"description": "This supports the authenticate portion of the 3rd party Identity Provider.\nIdentity : redirect\nAuthenticate : url \nThis is the `Authenticate` portion of the above"
-			},
-			"response": []
-		},
-		{
-			"name": "IdentiyExtractRedirectAuthenticate",
-			"request": {
-				"url": {
-					"raw": "{{url}}/identity-extract/redirect?app-name=SpoonApp&original-url=https://whatever.com&rstate=apicrstate",
-					"protocol": "{{url}}/identity-extract/redirect?app-name=SpoonApp&original-url=https",
-					"host": [
-						"whatever",
-						"com&rstate=apicrstate"
-					],
-					"query": [
-						{
-							"key": "app-name",
-							"value": "SpoonApp",
-							"equals": true,
-							"description": ""
-						},
-						{
-							"key": "original-url",
-							"value": "https://whatever.com",
-							"equals": true,
-							"description": ""
-						},
-						{
-							"key": "rstate",
-							"value": "apicrstate",
-							"equals": true,
-							"description": ""
-						}
-					],
-					"variable": []
-				},
-				"method": "GET",
-				"header": [],
-				"body": {},
-				"description": "This is the beginning of the support for 3rd party Identity Provider..\nIdentity : redirect\nAuthorization : authenticate-url\n^^^ This is the Identity"
-			},
-			"response": []
-		},
-		{
-			"name": "Basic Authentication",
-			"request": {
-				"url": "{{url}}/basic-auth/{{username}}/{{password}}",
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Basic c3Bvb246c3Bvb24=",
-						"description": ""
-					}
-				],
-				"body": {},
-				"description": "/{username}/{password}\nChoose your username & password"
-			},
-			"response": []
-		},
-		{
-			"name": "Hello.....",
-			"request": {
-				"url": "{{url}}/ping",
 				"method": "GET",
 				"header": [],
 				"body": {},
