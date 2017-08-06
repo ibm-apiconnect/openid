@@ -386,13 +386,12 @@ x-ibm-configuration:
       - implicit
     identity-extraction:
       type: default-form
-      redirect-url: 'https://127.0.0.1:443/utility/identity-extract-redirect'
     authentication:
       x-ibm-authentication-url:
         url: 'https://192.168.1.66:4002/utility/basic-auth/spoon/spoon'
         tls-profile: ''
     authorization:
-      type: default-form
+      type: authenticated
     access-token:
       ttl: 3600
     revocation:
@@ -407,6 +406,16 @@ x-ibm-configuration:
   gateway: datapower-gateway
   assembly:
     execute:
+      - set-variable:
+          title: set-variable
+          actions:
+            - set: iss.claim
+              value: $(OIDCIssuer)
+            - set: sign-jwk
+              value: $(JWSSignPrivateKey)
+            - set: jwt.sign.algorithm
+              value: $(JWSAlgorithm)
+          version: 1.0.0
       - switch:
           title: switch
           case:
@@ -502,22 +511,6 @@ x-ibm-configuration:
           title: if
           condition: apim.getvariable('oidc-credential') !== undefined
           execute:
-            - set-variable:
-                title: set-variable
-                actions:
-                  - set: iss.claim
-                    value: Spoon Bank Inc
-                  - set: sign-jwk
-                    value: >-
-                      {   "kty": "RSA",   "d":
-                      "IcXNi8cf4MPHgjpJTklPa6debT2OYC8UVGyk9ZdM883Pin8_wLazOOKPeF7oQz8gX6ZCNfe1X_PBo4pCsJvajsp8PNO1LxXOvnE_aRUQUR4MdWv4GmPMxuFluKpYpg3US9Xa8FYoHDtYjunp0f5r_Rmr-4L_3pxLHDHk97NQCpJjpNXUgP1WbiTjZ6qNbMNEaUKoexiIXjuaTsgtheSHh4EKPMLWdlmwK5ma5lALzmEwdCc878pcS4WaULVOxCQ8N7XUwz2A823Iax8sZ0c7ZAMyjjEW7Gx9IUBTc8s9lUjrxvKzRXPdjL2q-g6sVnvYvo9hE-XLCY5Yir3w0PEn2Gpvi-YbO5IZ0CynT-ohPOWPkD7ciWpWZQIPq8i84412UAfVlIijgPEKQNdH4wFIFSPcaSmoZbMkxdFKVIJJQF_6_onWqpS5wTNCk6R0EkfFMX-k7yqPXgmTcJkKetovPaFxVse-PWVzbdzX0Y7WOQ24DCoyqDxJ5pqqzmtbFHEDO-eGL8ikRm3PMyGjyHX8mffBg7uQxKfSvciPbic_lZQaRqAROVvFMHQjQni7su1qLJPdcCeb9abGjnjYRb_7Riuw7JgmPdw82TYtOLMdiNmraOcsVA18mHvMY57I5KQ5JyJqdm7Q4-lysCzuFplzH5nOolmArCKJG7cA1_-hS4E",  
-                      "e": "AQAB",   "use": "sig",   "kid": "spoon",   "alg":
-                      "RS512",   "n":
-                      "nNekmaBt236y5xI0ZoFo3r6WJH-hVnK6-_RFHrLW_GwIkWScu-iPqns3osztdo5Js36VHqf4TV87DZE82_uO_u40YKbuDiGhKmBS6JIqfRFe-XombaPUqAVz_fgv5f68jBWZ8cwy1kRLpqXkD9KvOruqeG9fOyQq0hYUfdQFxECxeTS0Xl1N_sELQdl9Ou7lhjk18hYfLe5zII2THxgLP24JP4L2AgjTZcO--434bMn-EK8KSUZ1qGEMmF_F1M6qAzrbTYmnfaewV8sFV25X2_vD8Y28CVmR9FgH6VY6o9GUUKlmmx9mwmFfodgPxFtqITxdhQ8S2rpg0WMvSlbxqtolD91MsXeiqvWGCuQmb3CUzJrMPb5XEgt-6l4WvT2_FffBHaRvpSLw-cVN6TauL1SusFsN0plkuapJQBccfHgU4tS51NvlXJ2ISueUVK5vKlBywfxe5V9EHE0EJ0V3fBA--bL5NBQHlLP7MnqV0BXGDHnwaZJ3160w2wDGGW7NxwTUNwtsJgNg_k9kAqm4vWsttxUE-HdF1cprCl-jyuDnCOv6AHCWi6oQF1X13FtegWq8rNwEA_S_qnd_Qmhs8g5IFvBVaAWBmnbNd8TMdGNfLoSXbUlWnu1_JPIdIiWrAEsw-nhwDl7h7_9JGbfpMC8DEi3zWNvEc5erpNZAAp0"
-                      }
-                  - set: jwt.sign.algorithm
-                    value: RS512
-                version: 1.0.0
             - xslt:
                 title: xslt
                 input: false
@@ -601,7 +594,7 @@ x-ibm-configuration:
                 sub-claim: oidc-credential
                 aud-claim: client.app.id
                 private-claims: added.claim
-                jws-alg: RS512
+                jws-alg: RS256
                 jws-jwk: sign-jwk
             - gatewayscript:
                 title: gatewayscript
@@ -632,17 +625,17 @@ x-ibm-configuration:
             - if:
                 title: if
                 condition: >-
-                  new String (apim.getvariable
-                  ('message.status.code')).startsWith('302')
+                  new String
+                  (apim.getvariable('message.status.code')).startsWith('302')
                 execute:
                   - xslt:
                       title: xslt
                       input: false
                       version: 1.0.0
-                      source: >-
+                      source: >
                         <xsl:stylesheet
                         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                        version="1.0"
+                          version="1.0"
                           xmlns:dp="http://www.datapower.com/extensions"
                           xmlns:apim="http://www.ibm.com/apimanagement"
                           extension-element-prefixes="dp apim"
@@ -656,6 +649,24 @@ x-ibm-configuration:
                 version: 1.0.0
           version: 1.0.0
     catch: []
+  properties:
+    JWSSignPrivateKey:
+      value: >-
+        {   "kty": "RSA",   "d":
+        "IcXNi8cf4MPHgjpJTklPa6debT2OYC8UVGyk9ZdM883Pin8_wLazOOKPeF7oQz8gX6ZCNfe1X_PBo4pCsJvajsp8PNO1LxXOvnE_aRUQUR4MdWv4GmPMxuFluKpYpg3US9Xa8FYoHDtYjunp0f5r_Rmr-4L_3pxLHDHk97NQCpJjpNXUgP1WbiTjZ6qNbMNEaUKoexiIXjuaTsgtheSHh4EKPMLWdlmwK5ma5lALzmEwdCc878pcS4WaULVOxCQ8N7XUwz2A823Iax8sZ0c7ZAMyjjEW7Gx9IUBTc8s9lUjrxvKzRXPdjL2q-g6sVnvYvo9hE-XLCY5Yir3w0PEn2Gpvi-YbO5IZ0CynT-ohPOWPkD7ciWpWZQIPq8i84412UAfVlIijgPEKQNdH4wFIFSPcaSmoZbMkxdFKVIJJQF_6_onWqpS5wTNCk6R0EkfFMX-k7yqPXgmTcJkKetovPaFxVse-PWVzbdzX0Y7WOQ24DCoyqDxJ5pqqzmtbFHEDO-eGL8ikRm3PMyGjyHX8mffBg7uQxKfSvciPbic_lZQaRqAROVvFMHQjQni7su1qLJPdcCeb9abGjnjYRb_7Riuw7JgmPdw82TYtOLMdiNmraOcsVA18mHvMY57I5KQ5JyJqdm7Q4-lysCzuFplzH5nOolmArCKJG7cA1_-hS4E",  
+        "e": "AQAB",   "use": "sig",   "kid": "spoon",   "alg": "RS512",   "n":
+        "nNekmaBt236y5xI0ZoFo3r6WJH-hVnK6-_RFHrLW_GwIkWScu-iPqns3osztdo5Js36VHqf4TV87DZE82_uO_u40YKbuDiGhKmBS6JIqfRFe-XombaPUqAVz_fgv5f68jBWZ8cwy1kRLpqXkD9KvOruqeG9fOyQq0hYUfdQFxECxeTS0Xl1N_sELQdl9Ou7lhjk18hYfLe5zII2THxgLP24JP4L2AgjTZcO--434bMn-EK8KSUZ1qGEMmF_F1M6qAzrbTYmnfaewV8sFV25X2_vD8Y28CVmR9FgH6VY6o9GUUKlmmx9mwmFfodgPxFtqITxdhQ8S2rpg0WMvSlbxqtolD91MsXeiqvWGCuQmb3CUzJrMPb5XEgt-6l4WvT2_FffBHaRvpSLw-cVN6TauL1SusFsN0plkuapJQBccfHgU4tS51NvlXJ2ISueUVK5vKlBywfxe5V9EHE0EJ0V3fBA--bL5NBQHlLP7MnqV0BXGDHnwaZJ3160w2wDGGW7NxwTUNwtsJgNg_k9kAqm4vWsttxUE-HdF1cprCl-jyuDnCOv6AHCWi6oQF1X13FtegWq8rNwEA_S_qnd_Qmhs8g5IFvBVaAWBmnbNd8TMdGNfLoSXbUlWnu1_JPIdIiWrAEsw-nhwDl7h7_9JGbfpMC8DEi3zWNvEc5erpNZAAp0"
+        }
+      description: ''
+      encoded: false
+    OIDCIssuer:
+      value: IBM APIc
+      description: ''
+      encoded: false
+    JWSAlgorithm:
+      value: RS256
+      description: ''
+      encoded: false
 definitions:
   access_token_response:
     type: object
