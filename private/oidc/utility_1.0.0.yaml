@@ -42,6 +42,8 @@ x-ibm-configuration:
               value: For your eyes only
             - set: demo.introspect.response.scope
               value: spoon fork knief
+            - set: demo.authenticate-url.x-selected-scope-w-desc
+              value: '{"mutual":"Mutual Fund"}'
           version: 1.0.0
           description: This set up value for the http response for the demo purpose
       - switch:
@@ -66,6 +68,9 @@ x-ibm-configuration:
 
                       var password = splitval[1] || '';
 
+                      var scope =
+                      apim.getvariable('request.headers.x-requested-scope');
+
                       apim.console.debug('user credential : [' + username + ':'
                       + password + ']');
 
@@ -77,9 +82,24 @@ x-ibm-configuration:
                             apim.getvariable('demo.api-authenticated-credential') !== undefined) {
                           apim.setvariable('message.headers.api-authenticated-credential', apim.getvariable('demo.api-authenticated-credential'));
                         }
+                        /* return scope without description */
+                        /*
                         if (apim.getvariable('demo.authenticate-url.x-selected-scope') !== '' &&
                             apim.getvariable('demo.authenticate-url.x-selected-scope') !== undefined) {
-                          apim.setvariable('message.headers.x-selected-scope', apim.getvariable('demo.authenticate-url.x-selected-scope'));
+                          apim.setvariable('message.headers.x-selected-scope', (scope + ' ' + apim.getvariable('demo.authenticate-url.x-selected-scope')));
+                        }
+                        */
+                        /* return scope with description */
+                        if (apim.getvariable('demo.authenticate-url.x-selected-scope-w-desc') !== '' &&
+                            apim.getvariable('demo.authenticate-url.x-selected-scope-w-desc') !== undefined) {
+                          var jsonscope = JSON.parse(apim.getvariable('demo.authenticate-url.x-selected-scope-w-desc'));
+                          if (scope !== undefined && scope !== '') {
+                            var token = scope.split(' ');
+                            for (var i=token.length; i--;) {
+                              jsonscope[token[i]] = '';  // setting the value to '', will allow apic to pick up its own description in the provider
+                            }
+                          }
+                          apim.setvariable('message.headers.x-selected-scope', JSON.stringify(jsonscope));
                         }
                         if (apim.getvariable('demo.authenticate-url.metainfo.4.token') !== '' &&
                             apim.getvariable('demo.authenticate-url.metainfo.4.token') !== undefined) {
@@ -229,9 +249,11 @@ x-ibm-configuration:
                     description: >-
                       This demostrate how to specify the credential that is
                       needed for third-party provider, when the credential is
-                      different from what IBM APIc provides
+                      different from what IBM APIc provides.
+
+                      Make sure the endpoint url and port is set up correctly
                     target-url: >-
-                      https://192.168.1.75:4001/$(api.root)/third-party-oauth/introspect
+                      https://$(api.endpoint.address):9443/$(api.root)/third-party-oauth/introspect
                     username: authorized-username-4-introspect
                     password: authorized-password-4-introspect
             - condition: >-
@@ -485,15 +507,6 @@ x-ibm-configuration:
                       apim.setvariable('message.status.code', 200);
           version: 1.0.0
   gateway: datapower-gateway
-  properties:
-    demo.x-selected-scope.to-be-added:
-      value: 'read:account-123'
-      description: ''
-      encoded: false
-    demo.authenticated-credential:
-      value: 'cn=spoon,ou=apic,o=ibm'
-      description: ''
-      encoded: false
   catalogs: {}
 paths:
   '/basic-auth/{username}/{password}':
