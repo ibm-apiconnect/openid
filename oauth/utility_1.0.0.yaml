@@ -30,7 +30,7 @@ x-ibm-configuration:
             - set: demo.owner.x-selected-scope
               value: 'read:8888-8888'
             - set: demo.authenticate-url.x-selected-scope
-              value: mutual
+              value: mutual openid
             - set: demo.identity.redirect.username
               value: spoon
             - set: demo.identity.redirect.confirmation
