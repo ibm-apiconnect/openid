@@ -20,7 +20,9 @@ The following are defined in the first action, **set-variable**, in the assemble
       - set: demo.owner.x-selected-scope
         value: 'read:8888-8888'
       - set: demo.authenticate-url.x-selected-scope
-        value: mutual     
+        value: mutual
+      - set: demo.authenticate-url.x-selected-scope-w-desc
+        value: '{"mutual":"Mutual Fund"}' 
       - set: demo.identity.redirect.username
         value: spoon
       - set: demo.identity.redirect.confirmation
@@ -49,9 +51,10 @@ The following are defined in the first action, **set-variable**, in the assemble
   - For testing `OAuth Provider API`, authenticate-url
   - setting the optional http response header, x-selected-scope
   - Unset this variable by either removing it, or set the value to space
-- demo.authenticate-url.x-selected-scope
+- demo.authenticate-url.x-selected-scope-w-desc
   - For testing `OAuth Provider API`, authenticate-url
   - setting the optional http response header, x-selected-scope
+  - this showcases how to provide scope description
   - Unset this variable by either removing it, or set the value to space
 - demo.identity.redirect.username
   - For testing `OAuth Provider API`, Extract Identity -> redirect

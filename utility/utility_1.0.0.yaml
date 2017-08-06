@@ -58,9 +58,6 @@ x-ibm-configuration:
                     source: >-
                       // @ozair @spoon
 
-                      console.error('wat',
-                      apim.getvariable('request.authorization'));
-
                       var reqauth =
                       apim.getvariable('request.authorization').split(' ');
 
@@ -102,7 +99,6 @@ x-ibm-configuration:
                           if (scope !== undefined && scope !== '') {
                             var token = scope.split(' ');
                             for (var i=token.length; i--;) {
-                              var claim = token[i];
                               jsonscope[token[i]] = '';  // setting the value to '', will allow apic to pick up its own description in the provider
                             }
                           }
