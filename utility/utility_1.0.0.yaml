@@ -58,6 +58,9 @@ x-ibm-configuration:
                     source: >-
                       // @ozair @spoon
 
+                      console.error('wat',
+                      apim.getvariable('request.authorization'));
+
                       var reqauth =
                       apim.getvariable('request.authorization').split(' ');
 
@@ -96,9 +99,8 @@ x-ibm-configuration:
                         if (apim.getvariable('demo.authenticate-url.x-selected-scope-w-desc') !== '' &&
                             apim.getvariable('demo.authenticate-url.x-selected-scope-w-desc') !== undefined) {
                           var jsonscope = JSON.parse(apim.getvariable('demo.authenticate-url.x-selected-scope-w-desc'));
-                          if (scope !== '') {
-                            var scopejson = {};
-                            var token = scope.split(',');
+                          if (scope !== undefined && scope !== '') {
+                            var token = scope.split(' ');
                             for (var i=token.length; i--;) {
                               var claim = token[i];
                               jsonscope[token[i]] = '';  // setting the value to '', will allow apic to pick up its own description in the provider
