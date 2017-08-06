@@ -1,0 +1,682 @@
+swagger: '2.0'
+info:
+  x-ibm-name: utility
+  title: utility
+  version: 1.0.0
+schemes:
+  - https
+host: $(catalog.host)
+basePath: /utility
+consumes:
+  - application/json
+produces:
+  - application/json
+securityDefinitions: {}
+security: []
+x-ibm-configuration:
+  testable: true
+  enforced: true
+  cors:
+    enabled: true
+  assembly:
+    execute:
+      - set-variable:
+          title: set-variable
+          actions:
+            - set: demo.api-authenticated-credential
+              value: 'cn=spoon,ou=ozair,o=ibm'
+            - set: demo.application.x-selected-scope
+              value: accountinfo
+            - set: demo.owner.x-selected-scope
+              value: 'read:8888-8888'
+            - set: demo.authenticate-url.x-selected-scope
+              value: mutual
+            - set: demo.identity.redirect.username
+              value: spoon
+            - set: demo.identity.redirect.confirmation
+              value: ozair
+            - set: demo.authenticate-url.metainfo.4.token
+              value: >-
+                eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI4ODgtODgtODg4OCIsIm5hbWUiOiJTcG9vbiIsImFkbWluIjp0cnVlfQ.FUzbH2_0OTbK4zwWOjzz-ivop1hetZkBpldGF77bJwM
+            - set: demo.authenticate-url.metainfo.4.payload
+              value: For your eyes only
+            - set: demo.introspect.response.scope
+              value: spoon fork knief
+            - set: demo.authenticate-url.x-selected-scope-w-desc
+              value: '{"mutual":"Mutual Fund"}'
+          version: 1.0.0
+          description: This set up value for the http response for the demo purpose
+      - switch:
+          title: switch
+          case:
+            - condition: >-
+                ((request.verb==='GET')&&(api.operation.path==='/basic-auth/{username}/{password}'))
+              execute:
+                - gatewayscript:
+                    title: gatewayscript
+                    version: 1.0.0
+                    source: >-
+                      // @ozair @spoon
+
+                      console.error('wat',
+                      apim.getvariable('request.authorization'));
+
+                      var reqauth =
+                      apim.getvariable('request.authorization').split(' ');
+
+                      var splitval = new Buffer((reqauth[1] || ''),
+                      'base64').toString('utf8').split(':');
+
+                      var username = splitval[0] || '';
+
+                      var password = splitval[1] || '';
+
+                      // x-requested-scope contains what the aplication
+                      requested
+
+                      var scope =
+                      apim.getvariable('request.headers.x-requested-scope');
+
+                      apim.console.debug('user credential : [' + username + ':'
+                      + password + ']');
+
+                      if (username ===
+                      apim.getvariable('request.parameters.username') &&
+                          password === apim.getvariable('request.parameters.password')) {
+                        session.output.write({"authenticatedUser":username});
+                        if (apim.getvariable('demo.api-authenticated-credential') !== '' &&
+                            apim.getvariable('demo.api-authenticated-credential') !== undefined) {
+                          apim.setvariable('message.headers.api-authenticated-credential', apim.getvariable('demo.api-authenticated-credential'));
+                        }
+                        /* return scope without description */
+                        /*
+                        if (apim.getvariable('demo.authenticate-url.x-selected-scope') !== '' &&
+                            apim.getvariable('demo.authenticate-url.x-selected-scope') !== undefined) {
+                          apim.setvariable('message.headers.x-selected-scope', (scope + ' ' + apim.getvariable('demo.authenticate-url.x-selected-scope')));
+                        }
+                        */
+                        /* return scope with description */
+                        if (apim.getvariable('demo.authenticate-url.x-selected-scope-w-desc') !== '' &&
+                            apim.getvariable('demo.authenticate-url.x-selected-scope-w-desc') !== undefined) {
+                          var jsonscope = JSON.parse(apim.getvariable('demo.authenticate-url.x-selected-scope-w-desc'));
+                          if (scope !== undefined && scope !== '') {
+                            var token = scope.split(' ');
+                            for (var i=token.length; i--;) {
+                              var claim = token[i];
+                              jsonscope[token[i]] = '';  // setting the value to '', will allow apic to pick up its own description in the provider
+                            }
+                          }
+                          apim.setvariable('message.headers.x-selected-scope', JSON.stringify(jsonscope));
+                        }
+                        if (apim.getvariable('demo.authenticate-url.metainfo.4.token') !== '' &&
+                            apim.getvariable('demo.authenticate-url.metainfo.4.token') !== undefined) {
+                          apim.setvariable('message.headers.api-oauth-metadata-for-accesstoken', apim.getvariable('demo.authenticate-url.metainfo.4.token'));
+                        }
+                        if (apim.getvariable('demo.authenticate-url.metainfo.4.payload') !== '' &&
+                            apim.getvariable('demo.authenticate-url.metainfo.4.payload') !== undefined) {
+                          apim.setvariable('message.headers.api-oauth-metadata-for-payload', apim.getvariable('demo.authenticate-url.metainfo.4.payload'));
+                        }
+                        apim.setvariable('message.status.code', 200);  
+                        apim.output('application/json');
+                      }
+
+                      else {
+                        apim.setvariable('message.status.code', 401);
+                      }
+            - condition: ((request.verb==='GET')&&(api.operation.path==='/ping'))
+              execute:
+                - gatewayscript:
+                    title: gatewayscript
+                    version: 1.0.0
+                    source: |-
+                      // @ozair @spoon
+                      var out = {"message":"Greeting! Hello World"};
+                      out.whoami = apim.getContext('api.endpoint.address');
+                      session.output.write(JSON.stringify(out));
+                      apim.output("application/json");
+            - condition: >-
+                ((request.verb==='POST')&&(api.operation.path==='/provider/scope-check/{component}'))
+              execute:
+                - gatewayscript:
+                    title: gatewayscript
+                    version: 1.0.0
+                    source: |
+                      apim.readInputAsJSON(function (error, json) {
+                        if (error) {
+                          apim.setvariable('message.status.code', 500);
+                        }
+                        else {
+                          // token_scope : scope that will be in the token_scope
+                          // api_scope : scope that can be have by the api
+                          console.debug('OAuth Provider AdvancedScope Check [', JSON.stringify(json), ']');
+                          
+                          var token_scope = json.token_scope;
+
+                          if (apim.getContext('request.parameters.component') === 'application') {
+                            if (apim.getvariable('demo.application.x-selected-scope') !== '' &&
+                                apim.getvariable('demo.application.x-selected-scope') !== undefined) {
+                              token_scope += ' ' + apim.getvariable('demo.application.x-selected-scope');
+                              apim.setvariable('message.headers.x-selected-scope', token_scope);
+                            }
+                          }
+                          else if (apim.getContext('request.parameters.component') === 'owner') {
+                            if (apim.getvariable('demo.owner.x-selected-scope') !== '' &&
+                                apim.getvariable('demo.owner.x-selected-scope') !== undefined) {
+                              token_scope += ' ' + apim.getvariable('demo.owner.x-selected-scope');
+                              apim.setvariable('message.headers.x-selected-scope', token_scope);
+                            }
+                          }
+                          apim.setvariable('message.status.code', 200);
+                        }
+                      });
+                    description: >-
+                      This demos how to use both optional OAuth
+                      Provider->Advanced Scope Check , for either application or
+                      owner
+            - condition: >-
+                ((request.verb==='GET')&&(api.operation.path==='/identity-extract/redirect'))
+              execute:
+                - gatewayscript:
+                    title: gatewayscript
+                    version: 1.0.0
+                    source: >-
+                      // @ozair @spoon
+
+                      console.error('original-url : ',
+                      apim.getContext('request.parameters.original-url'));
+
+                      console.error('app-name : ',
+                      apim.getContext('request.parameters.app-name'));
+
+                      console.error('appid : ',
+                      apim.getContext('request.parameters.appid'));
+
+                      console.error('org : ',
+                      apim.getContext('request.parameters.org'));
+
+                      console.error('orgid : ',
+                      apim.getContext('request.parameters.orgid'));
+
+                      console.error('catalog : ',
+                      apim.getContext('request.parameters.catalog'));
+
+                      console.error('catalogid : ',
+                      apim.getContext('request.parameters.catalogid'));
+
+                      console.error('provider : ',
+                      apim.getContext('request.parameters.provider'));
+
+                      console.error('providerid : ',
+                      apim.getContext('request.parameters.providerid'));
+
+
+                      /*
+
+                      apim.setvariable('message.status.code', 302);
+
+                      var hash = require('crypto').createHash('sha256');
+
+                      var params = apim.getvariable('request.parameters');
+
+                      var username = 'spoon-' + params['app-name'];
+
+                      var confirmationCode =
+                      hash.update(username).digest('base64');
+
+                      */
+
+                      var username =
+                      apim.getvariable('demo.identity.redirect.username');
+
+                      var confirmationCode =
+                      apim.getvariable('demo.identity.redirect.confirmation')
+
+                      var origUrl =
+                      decodeURIComponent(apim.getContext('request.parameters.original-url')
+                      ||
+                                            '');
+                      var location = origUrl + '&username=' + username +
+                      '&confirmation=' + confirmationCode;
+
+                      apim.setvariable('message.status.code', 302);
+
+                      apim.setvariable('message.headers.location', location);
+
+                      console.error('redirect back to apic [', location, ']');
+            - condition: >-
+                ((request.verb==='POST')&&(api.operation.path==='/third-party-oauth/introspect/proxy'))
+              execute:
+                - proxy:
+                    title: proxy
+                    timeout: 60
+                    verb: keep
+                    cache-response: protocol
+                    cache-ttl: 900
+                    version: 1.0.0
+                    description: >-
+                      This demostrate how to specify the credential that is
+                      needed for third-party provider, when the credential is
+                      different from what IBM APIc provides.
+
+                      Make sure the endpoint url and port is set up correctly
+                    target-url: >-
+                      https://$(api.endpoint.address):9443/$(api.root)/third-party-oauth/introspect
+                    username: authorized-username-4-introspect
+                    password: authorized-password-4-introspect
+            - condition: >-
+                ((request.verb==='POST')&&(api.operation.path==='/third-party-oauth/introspect'))
+              execute:
+                - gatewayscript:
+                    title: gatewayscript
+                    version: 1.0.0
+                    source: >+
+                      // @ozair @spoon
+
+                      // if x-provider-denied === true, set `active` claim to
+                      false
+
+
+                      apim.readInputAsBuffer(function (error, buffer) {
+                        if (error) {
+                          apim.setvariable('message.status.code', 500);
+                        }
+                        else {
+                          var response = {"active" : true};
+
+                          if (apim.getvariable('demo.introspect.response.scope') !== '' &&
+                            apim.getvariable('demo.introspect.response.scope') !== undefined) {
+                            response['scope'] = apim.getvariable('demo.introspect.response.scope');
+                          }
+
+                          if (apim.getContext('request.headers.x-provider-denied') === 'true') {
+                            response.active = false;
+                          }
+                          response['basic-authorization'] = apim.getContext('request.authorization');
+                          response['input_body'] = buffer.toString();
+                          apim.output('application/json');
+                          apim.setvariable('message.status.code', 200);
+                          session.output.write(JSON.stringify(response));
+                        }
+                      });
+
+                    description: >-
+                      this simulates what 3rd Party OAuth Provider introspection
+                      endpoint, and it will return a response based on
+                      x-provider-denied http header
+            - condition: >-
+                ((request.verb==='GET')&&(api.operation.path==='/identity-extract/redirect/authenticate'))
+              execute:
+                - gatewayscript:
+                    title: gatewayscript
+                    version: 1.0.0
+                    source: >-
+                      // @ozair @spoon
+
+                      var reqauth =
+                      apim.getvariable('request.authorization').split(' ');
+
+                      var splitval = new Buffer((reqauth[1] || ''),
+                      'base64').toString('utf8').split(':');
+
+                      var username = splitval[0] || '';
+
+                      var password = splitval[1] || ''; 
+
+                      /*
+
+                      if (password !== hash.update(username).digest('base64')) {
+                          apim.setvariable('message.status.code', 401);
+                      }
+
+                      else {
+                          apim.setvariable('message.status.code', 200);
+                      }
+
+                      */
+
+                      if (username ===
+                      apim.getvariable('demo.identity.redirect.username') &&
+                          password === apim.getvariable('demo.identity.redirect.confirmation')) {
+                          apim.setvariable('message.status.code', 200);
+                          if (apim.getvariable('demo.authenticate-url.x-selected-scope') !== '' &&
+                              apim.getvariable('demo.authenticate-url.x-selected-scope') !== undefined) {
+                              apim.setvariable('message.headers.x-selected-scope', apim.getvariable('demo.authenticate-url.x-selected-scope'));
+                          }
+                          if (apim.getvariable('demo.api-authenticated-credential') !== '' &&
+                              apim.getvariable('demo.api-authenticated-credential') !== undefined) {
+                              apim.setvariable('message.headers.api-authenticated-credential', apim.getvariable('demo.api-authenticated-credential'));
+                          }
+                          if (apim.getvariable('demo.authenticate-url.metainfo.4.token') !== '' &&
+                              apim.getvariable('demo.authenticate-url.metainfo.4.token') !== undefined) {
+                              apim.setvariable('message.headers.api-oauth-metadata-for-accesstoken', apim.getvariable('demo.authenticate-url.metainfo.4.token'));
+                          }
+                          if (apim.getvariable('demo.authenticate-url.metainfo.4.payload') !== '' &&
+                              apim.getvariable('demo.authenticate-url.metainfo.4.payload') !== undefined) {
+                              apim.setvariable('message.headers.api-oauth-metadata-for-payload', apim.getvariable('demo.authenticate-url.metainfo.4.payload'));
+                          }
+                      }
+
+                      else {
+                          apim.setvariable('message.status.code', 401);
+                      }
+            - condition: ((request.verb==='GET')&&(api.operation.path==='/dump-qe'))
+              execute:
+                - xslt:
+                    title: xslt
+                    input: false
+                    version: 1.0.0
+                    source: |
+                      <!-- @ozair @spoon
+                           this is for internal debugging purpose,
+                           should not be exposed 
+                      -->
+                      <xsl:stylesheet version="1.0"
+                        xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                        xmlns:dp="http://www.datapower.com/extensions"
+                        xmlns:apim="http://www.ibm.com/apimanagement"
+                        extension-element-prefixes="dp"
+                        exclude-result-prefixes="dp apim">
+
+                        <xsl:include href="store:///dp/oauth-cache.xsl"/>
+                        <xsl:include href="local:///isp/policy/apim.custom.xsl"/>
+                        
+                        <xsl:template match="/">
+                          <xsl:variable name="owner" select="apim:getContextByVariable('demo.api-authenticated-credential')"/>
+                          <dp:set-http-request-header name="'Content-Type'"
+                                                      value="'application/json; charset=UTF-8'"/>
+                          <dp:set-http-response-header name="'Content-Type'"
+                                                       value="'application/json; charset=UTF-8'"/>
+                          <dp:set-http-response-header name="'Cache-Control'"
+                                                       value="'private, no-store, no-cache, must-revalidate'"/>
+                          <dp:set-http-response-header name="'Pragma'"
+                                                       value="'no-cache'"/>
+                          <dp:set-variable name="'var://service/mpgw/skip-backside'" value="true()"/>
+
+                          <xsl:choose>
+                            <xsl:when test="$owner != ''">
+                              <xsl:message dp:priority="error">*retrieving for owner [<xsl:value-of select="$owner"/>*</xsl:message>
+                              <xsl:call-template name="issued-permission-by-owner">
+                                <xsl:with-param name="owner" select="$owner"/>
+                              </xsl:call-template>
+                            </xsl:when>
+                            <xsl:otherwise>
+                              <xsl:text>[]</xsl:text>
+                            </xsl:otherwise>
+                          </xsl:choose>
+                          <xsl:call-template name="apim:output">
+                            <xsl:with-param name="mediaType" select="'application/json'" />
+                          </xsl:call-template>
+                        </xsl:template>
+                      </xsl:stylesheet>
+            - condition: >-
+                ((request.verb==='GET')&&(api.operation.path==='/custom-login-form'))
+              execute:
+                - gatewayscript:
+                    title: gatewayscript
+                    version: 1.0.0
+                    source: |+
+                      // @ozair @spoon
+                      var form = '<html lang="en" xml:lang="en">' +
+                                 '<head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>Spoon Company</head>' +
+                                 '<body>' +
+                                 '<form method="POST" enctype="application/x-www-form-urlencoded" action="authorize">' + 
+                                 '<h1>Please sign in</h1>' +
+                                 '<p>Username </p>' +
+                                 '<p style="text-indent: 0em;"><input type="text" name="username" required="required"/></p>' +
+                                 '<p>Password </p>' +
+                                 '<p style="text-indent: 0em;"><input type="password" name="password" required="required"/></p>' +
+                                 '<EI-INJECT-HIDDEN-INPUT-FIELDS/>' +
+                                 '<p style="text-indent: 2em;"> <button id="login_button" type="submit" name="login" value="true">Log in</button></p>' +
+                                 '<EI-LOGINFIRSTTIME><p>If you have forgotten your user name or password, contact your system administrator.</p></EI-LOGINFIRSTTIME>' +
+                                 '<EI-LOGINFAILED><p style="color: red">At least one of your entries does not match our records. ' +
+                                 'If you have forgotten your user name or password, contact your system administrator.</p></EI-LOGINFAILED>' +
+                                 '<EI-INTERNAL-CUSTOM-FORM-ERROR/>' +
+                                 '</form></body></html>';
+                      session.output.write(form);
+                      apim.output('text/html');
+                      apim.setvariable('message.status.code', 200);
+
+
+            - condition: >-
+                ((request.verb==='GET')&&(api.operation.path==='/custom-consent-form'))
+              execute:
+                - gatewayscript:
+                    title: gatewayscript
+                    version: 1.0.0
+                    source: |-
+                      // @ozair @spoon
+                      var formPost5060 = '<html lang="en" xml:lang="en">' +
+                                         '<head><title>Awesome Application requests your permission for...</title></head>' +
+                                         '<body class="customconsent"><div><div>' +
+                                         '<form method="post" enctype="application/x-www-form-urlencoded" action="authorize">' +
+                                         '<AZ-INJECT-HIDDEN-INPUT-FIELDS/>' +
+                                         '<p>Greeting..</p><DISPLAY-RESOURCE-OWNER/>' +
+                                         '<p>This app </p><OAUTH-APPLICATION-NAME/><p> would like to access your data.</p>' +
+                                         '<div>' +
+                                         '<button class="cancel" type="submit" name="approve" value="false">No Thanks</button>' +
+                                         '<button class="submit" type="submit" name="approve" value="true">Allow Access</button>' +
+                                         '</div></form></div>' +
+                                         '<AZ-INTERNAL-CUSTOM-FORM-ERROR/>' +
+                                         '</div></body></html>';
+                      session.output.write(formPost5060);
+                      apim.output('text/html');
+                      apim.setvariable('message.status.code', 200);
+            - condition: >-
+                ((request.verb==='POST')&&(api.operation.path==='/api/scope-check'))
+              execute:
+                - gatewayscript:
+                    title: gatewayscript
+                    version: 1.0.0
+                    source: |-
+                      apim.readInputAsJSON(function (error, json) {
+                        if (error) {
+                          apim.setvariable('message.status.code', 500);
+                        }
+                        else {
+                          console.debug('OAuth Consumer API AdvancedScope Check [', JSON.stringify(json), ']');
+                          var token_scope = json.token_scope;
+                          if ((token_scope.indexOf(apim.getvariable('demo.application.x-selected-scope')) > -1) ||
+                              (token_scope.indexOf(apim.getvariable('demo.authenticate-url.x-selected-scope')) > -1) ||
+                              (token_scope.indexOf(apim.getvariable('demo.owner.x-selected-scope')) > -1)) {
+                            apim.setvariable('message.headers.x-advanced-scope-optional-resp', 'ForDemoPurpose');
+                            apim.setvariable('message.status.code', 200);
+                          }
+                          else {
+                            apim.setvariable('message.status.code', 500);
+                          }
+                        }
+                      });
+                    description: >-
+                      This demos how to use the consumer api -> Advanced Scope
+                      Check option
+            - condition: ((request.verb==='GET')&&(api.operation.path==='/metadata-url'))
+              execute:
+                - gatewayscript:
+                    title: gatewayscript
+                    version: 1.0.0
+                    source: >-
+                      // @ozair @spoon
+
+                      if
+                      (apim.getvariable('demo.authenticate-url.metainfo.4.token')
+                      !== '' &&
+                          apim.getvariable('demo.authenticate-url.metainfo.4.token') !== undefined) {
+                          apim.setvariable('message.headers.api-oauth-metadata-for-accesstoken', apim.getvariable('demo.authenticate-url.metainfo.4.token'));
+                      }
+
+                      if
+                      (apim.getvariable('demo.authenticate-url.metainfo.4.payload')
+                      !== '' &&
+                          apim.getvariable('demo.authenticate-url.metainfo.4.payload') !== undefined) {
+                          apim.setvariable('message.headers.api-oauth-metadata-for-payload', apim.getvariable('demo.authenticate-url.metainfo.4.payload'));
+                      }
+
+                      apim.setvariable('message.status.code', 200);
+          version: 1.0.0
+  gateway: datapower-gateway
+  catalogs: {}
+paths:
+  '/basic-auth/{username}/{password}':
+    get:
+      responses:
+        '200':
+          description: 200 OK
+    parameters:
+      - $ref: '#/parameters/username'
+      - $ref: '#/parameters/password'
+  /ping:
+    get:
+      responses:
+        '200':
+          description: 200 OK
+  /identity-extract/redirect:
+    get:
+      responses:
+        '200':
+          description: 200 OK
+    parameters:
+      - $ref: '#/parameters/app-name'
+      - $ref: '#/parameters/appid'
+      - $ref: '#/parameters/original-url'
+      - $ref: '#/parameters/org'
+      - $ref: '#/parameters/orgid'
+      - $ref: '#/parameters/catalog'
+      - $ref: '#/parameters/catalogid'
+      - $ref: '#/parameters/provider'
+      - $ref: '#/parameters/providerid'
+      - $ref: '#/parameters/api_parameter'
+  /identity-extract/redirect/authenticate:
+    get:
+      responses:
+        '200':
+          description: 200 OK
+  /third-party-oauth/introspect:
+    post:
+      responses:
+        '200':
+          description: 200 OK
+      parameters:
+        - name: x-provider-denied
+          type: string
+          required: false
+          in: header
+    parameters:
+      - $ref: '#/parameters/token_type_hint'
+      - $ref: '#/parameters/token'
+  /third-party-oauth/introspect/proxy:
+    post:
+      responses:
+        '200':
+          description: 200 OK
+  /dump-qe:
+    get:
+      responses:
+        '200':
+          description: 200 OK
+  /custom-login-form:
+    get:
+      responses:
+        '200':
+          description: 200 OK
+      summary: This demos how to host a custom form to be used by IBM APIc
+  /custom-consent-form:
+    get:
+      responses:
+        '200':
+          description: 200 OK
+  '/provider/scope-check/{component}':
+    post:
+      responses:
+        '200':
+          description: 200 OK
+      parameters:
+        - $ref: '#/parameters/scope_check'
+  /api/scope-check:
+    post:
+      responses:
+        '200':
+          description: 200 OK
+  /metadata-url:
+    get:
+      responses:
+        '200':
+          description: 200 OK
+tags: []
+parameters:
+  username:
+    name: username
+    type: string
+    required: true
+    in: path
+  password:
+    name: password
+    type: string
+    required: true
+    in: path
+  app-name:
+    name: app-name
+    type: string
+    required: false
+    in: query
+  original-url:
+    name: original-url
+    type: string
+    required: false
+    in: query
+  appid:
+    name: appid
+    type: string
+    required: false
+    in: query
+  org:
+    name: org
+    type: string
+    required: false
+    in: query
+  orgid:
+    name: orgid
+    type: string
+    required: false
+    in: query
+  catalog:
+    name: catalog
+    type: string
+    required: false
+    in: query
+  catalogid:
+    name: catalogid
+    type: string
+    required: false
+    in: query
+  provider:
+    name: provider
+    type: string
+    required: false
+    in: query
+  providerid:
+    name: providerid
+    type: string
+    required: false
+    in: query
+  token_type_hint:
+    name: token_type_hint
+    required: false
+    in: formData
+    description: access_token
+    type: string
+  token:
+    name: token
+    required: false
+    in: formData
+    type: string
+  component:
+    name: component
+    type: string
+    required: true
+    in: path
+    description: '{application | owner} This is used by OAuth Provider for Demo'
+  rstate:
+    name: rstate
+    type: string
+    required: false
+    in: query
