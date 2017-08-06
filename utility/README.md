@@ -74,6 +74,8 @@ The following are defined in the first action, **set-variable**, in the assemble
   - This will set the scope response for the demo `3rd party OAuth Provider introspection`
   - Unset this variable by either removing it, or set the value to space
 
+### 
+
 To test the utility.yaml
 1. ping
   - make sure it is hosted properly
@@ -87,6 +89,23 @@ To test the utility.yaml
 
 ### set up the oauth configuration ###
 ```
+```
+
+
+```
 ~/GitHub/openid/private/oidc (💃 ) apic config:set oauth-redirect-uri=https://www.getpostman.com/oauth2/callback
 oauth-redirect-uri: https://www.getpostman.com/oauth2/callback
 ```
+
+
+```
+~/GitHub/openid/oauth-basic (💃 ) docker ps
+CONTAINER ID        IMAGE                                                      COMMAND                CREATED             STATUS              PORTS                                                                                             NAMES
+3a138c4ce4b8        ibm-apiconnect-toolkit/datapower-api-gateway:1.0.55        "/bin/drouter"         4 minutes ago       Up 4 minutes        0.0.0.0:32795->80/tcp, 0.0.0.0:32794->5554/tcp, 0.0.0.0:32793->9090/tcp, 0.0.0.0:4002->9443/tcp   oauthbasic_datapower-api-gateway_1
+da4c06c3a40e        ibm-apiconnect-toolkit/datapower-mgmt-server-lite:1.0.55   "node lib/server.js"   4 minutes ago       Up 4 minutes        0.0.0.0:32792->2443/tcp                                                                           oauthbasic_datapower-mgmt-server-lite_1
+```
+
+i.. install interceptor
+ii.. enable it
+iii.. change the setting, disable redirect
+
