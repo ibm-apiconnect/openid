@@ -68,9 +68,6 @@ x-ibm-configuration:
 
                       var password = splitval[1] || '';
 
-                      // x-requested-scope contains what the aplication
-                      requested
-
                       var scope =
                       apim.getvariable('request.headers.x-requested-scope');
 
@@ -508,9 +505,97 @@ x-ibm-configuration:
                       }
 
                       apim.setvariable('message.status.code', 200);
+            - condition: >-
+                ((request.verb==='GET')&&(api.operation.path==='/.well-known/jwks.json'))
+              execute:
+                - gatewayscript:
+                    title: gatewayscript
+                    version: 1.0.0
+                    source: |-
+                      apim.setvariable('message.status.code', 200);
+                      apim.output('application/json');
+                      session.output.write(apim.getvariable('JWSSigningKey'));
+            - condition: (api.operation.path==='/google-microservice')
+              execute:
+                - gatewayscript:
+                    title: gatewayscript
+                    version: 1.0.0
+                    source: |+
+                      apim.setvariable('message.status.code', 200);
+
+                      apim.readInputAsBuffer(function (error, buffer) {
+
+                          if (error) {
+                              var ar = {'active': false};
+                              apim.setvariable('message.body', ar);
+                          }
+                          else {
+                              
+                              // get the information as in buffer, now parse 
+                              var topsplit = (buffer.toString()).split('&');
+                              var accesstoken = '';
+                              topsplit.forEach(function(a) {
+                                 if (a.substring(0, 6) === 'token=') {
+                                     accesstoken = a.substring(6);
+                                 }
+                              });
+
+                              console.error('access_token [', accesstoken, ']');
+                              var urlOptions = {
+                                 target: 'https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=',
+                                 method: 'GET',
+                                 sslProxyProfile: 'api-sslcli-all'
+                             }
+                              urlOptions.target = urlOptions.target + accesstoken;
+
+                              try {
+                                  var urlopen=require('urlopen');
+                                  var request = urlopen.open(urlOptions, function (connectError, response) {
+                                      if (connectError) {
+                                          console.error('1');
+                                          var ar = {'active': false};
+                                          apim.setvariable('message.body', ar);
+                                      } 
+                                      else {
+                                          // Note: The back-end may have put an x-dp-response-code header in the
+                                          // response. However, that header is not supported for Gateway script
+                                          // and will be ignored. This does not cause any problems.
+                                          var responseCode = response.statusCode;
+                                          console.error('2');
+                                          if (responseCode === 200) {
+                                              var ar = {'active': true};
+                                              apim.setvariable('message.body', ar);
+                                          }
+                                          else
+                                          {
+                                              var ar = {'active': false};
+                                              apim.setvariable('message.body', ar);
+                                          }
+                                      } // end of not connection error
+                                  }); // end of urlopen
+                          
+                              } catch (err) {
+                                  // Reject the session so that when the action completes, there 
+                                  // will be a processing rule error.
+                                  var ar = {'active': false};
+                                  apim.setvariable('message.body', ar);
+                              }
+                          }
+                      });
+
           version: 1.0.0
   gateway: datapower-gateway
   catalogs: {}
+  properties:
+    JWSSigningKey:
+      value: >-
+        {   "kty": "RSA",   "d":
+        "ZgiybjfeIsoihPMRQpT9Yv5Qfvg5AaqdGRK8mb1G73_CrOjpTbXjs7t0AKKNTGFUlvla4ag9kof4qzA7EB0Kgpsn05668sQtenIkz83pP1v7MaM31YovGq1WCmCpV8lJvuaSAP06ueRmEYG5zhtT9lK3TVxvuYwCd_Ukfe0M3R3ajyLEvPLhnwS5mybAj0mP5lat1l29qXhC-WNhDRZfl6NdVge4yGyKLsNAXqWw0bi3ARE3dYPt7J36cqoET4agwOjjupxY8Ctv1tFw7Xj3lcUBciT_tYi3tKVs8ALalTQ-MHOXHEdDXaAxzgmLVgFD05bbE55OL25MLSvoD0bLAQ",  
+        "e": "AQAB",   "use": "sig",   "kid": "spoon",   "alg": "RS256",   "n":
+        "iE7cj97VkW-QXXU0U9Fedjl7digjnp_R7lx6LHLugHfS5Xp26GCxOO1pNktSHsfof5EMJ0y8iqtIH4X3QYLg6E6fEZQD4-ZpIaKhTDuel1Zls_NRFgrQ0gzB3oiNJbNMfbNLpx4hCauRRv_RqRb1__jkBRIiU3MrEmB6gBDBQYJ9vwcYDXT5qowAopoZk6p1bf6kftMswVoFsILt9XdBynTHcLPyj61mP0faUb5_VRkpXaCbyCn4G1XakKswqzSkULImNQykaK_I6IJ0CGI0gnnx5YmwNbo4AYS-8fDODXfThDZC12TM_BlCGQMAao2jSSXaebI1nyxmgaYV1oChbw"
+        }
+      description: ''
+      encoded: false
 paths:
   '/basic-auth/{username}/{password}':
     get:
@@ -597,6 +682,20 @@ paths:
       responses:
         '200':
           description: 200 OK
+  /.well-known/jwks.json:
+    get:
+      responses:
+        '200':
+          description: 200 OK
+  /google-microservice:
+    post:
+      responses:
+        '200':
+          description: 200 OK
+      deprecated: false
+      parameters:
+        - $ref: '#/parameters/token_type_hint'
+        - $ref: '#/parameters/token'
 tags: []
 parameters:
   username:
