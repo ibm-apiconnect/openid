@@ -103,7 +103,7 @@ request :
        <scope>checking saving</scope>
        <resource_owner>cn=spoon,o=ibm</resource_owner>
        <refresh_token>AAIHZGVmYXV....</refresh_token>
-       <miscinfo><xsl:value-of select="/input/result/miscinfo"/></miscinfo>
+       <miscinfo>....</miscinfo>
      </token>
 
 
@@ -123,7 +123,7 @@ request :
        <scope>checking saving</scope>
        <resource_owner>cn=spoon,o=ibm</resource_owner>
        <refresh_token>AAIHZGVmYXV....</refresh_token>
-       <miscinfo><xsl:value-of select="/input/result/miscinfo"/></miscinfo>
+       <miscinfo>....</miscinfo>
      </token>
 
     
