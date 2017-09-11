@@ -27,13 +27,13 @@ In this tutorial, you will learn how to setup API Connect with the OpenID Connec
 These instructions assume you are familiar with the basic steps of the API designer. You will import the OAuth provider YAML file which provides support for OIDC. We will review it first to understand the core functions.
 
 1. Import API definitions file: oauth, utility and Weather. Click the **Add (+)** button and select **Import API from a file or URL**. 
-	* [https://raw.githubusercontent.com/ibm-apiconnect/openid/master/weather-provider-api_1.0.0.yaml]() 
-	* [https://raw.githubusercontent.com/ibm-apiconnect/openid/master/oidc_1.0.0.yaml](). 
-	* [https://raw.githubusercontent.com/ibm-apiconnect/openid/master/utility/utility_1.0.0.yaml]().
+	* [https://raw.githubusercontent.com/ibm-apiconnect/openid/master/weather-provider-api_1.0.0.yaml](https://raw.githubusercontent.com/ibm-apiconnect/openid/master/weather-provider-api_1.0.0.yaml) 
+	* [https://raw.githubusercontent.com/ibm-apiconnect/openid/master/oidc_1.0.0.yaml](https://raw.githubusercontent.com/ibm-apiconnect/openid/master/oidc_1.0.0.yaml). 
+	* [https://raw.githubusercontent.com/ibm-apiconnect/openid/master/utility/utility_1.0.0.yaml](https://raw.githubusercontent.com/ibm-apiconnect/openid/master/utility/utility_1.0.0.yaml).
 
 	In this tutorial, we will simulate the authentication service (leveraging HTTP Basic AUth) using the `utility` API, which is an API Connect hosted Assembly that will examine the input request and return back the appropriate response. You could also use alternative approaches to validate the resource owner (such as `redirect`), but for simplicity, we will use a simple service to demonstrate the input and output parameters of the authentication service call.
 
-2. Navigate to the folder `https://raw.githubusercontent.com/ibm-apiconnect/openid/master/utility/src/basic-auth` directory and open the `basic-auth.js` file. This file will simulate the authentication service during the OIDC handshake. A few points about the code:
+2. Navigate to the folder `https://github.com/ibm-apiconnect/openid/tree/master/utility/src/authentication` directory and open the `basic-auth.js` file. This file will simulate the authentication service during the OIDC handshake. A few points about the code:
 	* Authentication is simulated by validating the username/password passed in via HTTP Basic Auth header against the query params. For example, the input request will contain a HTTP Basic Auth header with value `spoon:spoon` (base 64 encoded) and will compare that against the Authentication URL call in the OIDC provider (ie `https://$(api.endpoint.address):9443/utility/spoon/spoon`).
 	* If you need access to the original query parameters passed into the request during authentication, you can access the `message` context to parse them. An example is shown that passes in a `request` query parameter which is a JWT token containing information about the transaction. This token can be passed to the service performing the authentication
 	```
