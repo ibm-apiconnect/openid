@@ -1,7 +1,7 @@
 {
 	"variables": [],
 	"info": {
-		"name": "APIc OAuth (dev)",
+		"name": "API Connect - OAuth API",
 		"_postman_id": "f4ea081f-bd24-a711-f12b-38cfa5871ee5",
 		"description": "",
 		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
@@ -9,6 +9,22 @@
 	"item": [
 		{
 			"name": "OAuth Password",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"postman.clearEnvironmentVariable(\"access_token\");",
+							"postman.clearEnvironmentVariable(\"refresh_token\");",
+							"var at = JSON.parse(responseBody);",
+							"postman.setEnvironmentVariable(\"access_token\", at.access_token);",
+							"postman.setEnvironmentVariable(\"refresh_token\", at.refresh_token);"
+						]
+					}
+				}
+			],
 			"request": {
 				"url": "https://{{host}}/oauth2/token",
 				"method": "POST",
@@ -60,6 +76,22 @@
 		},
 		{
 			"name": "OIDC Password",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"postman.clearEnvironmentVariable(\"access_token\");",
+							"postman.clearEnvironmentVariable(\"refresh_token\");",
+							"var at = JSON.parse(responseBody);",
+							"postman.setEnvironmentVariable(\"access_token\", at.access_token);",
+							"postman.setEnvironmentVariable(\"refresh_token\", at.refresh_token);"
+						]
+					}
+				}
+			],
 			"request": {
 				"url": "https://{{host}}/oauth2/token",
 				"method": "POST",
@@ -111,6 +143,22 @@
 		},
 		{
 			"name": "OAuth Implicit (public)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"postman.clearEnvironmentVariable(\"access_token\");",
+							"postman.clearEnvironmentVariable(\"refresh_token\");",
+							"var at = JSON.parse(responseBody);",
+							"postman.setEnvironmentVariable(\"access_token\", at.access_token);",
+							"postman.setEnvironmentVariable(\"refresh_token\", at.refresh_token);"
+						]
+					}
+				}
+			],
 			"request": {
 				"url": "https://{{host}}/oauth2/authorize",
 				"method": "POST",
@@ -122,7 +170,7 @@
 					},
 					{
 						"key": "Authorization",
-						"value": "Basic c3Bvb246c3Bvb24=",
+						"value": "Basic {{basic_auth_username}}",
 						"description": ""
 					}
 				],
@@ -167,6 +215,22 @@
 		},
 		{
 			"name": "OAuth Application (client_cred)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"postman.clearEnvironmentVariable(\"access_token\");",
+							"postman.clearEnvironmentVariable(\"refresh_token\");",
+							"var at = JSON.parse(responseBody);",
+							"postman.setEnvironmentVariable(\"access_token\", at.access_token);",
+							"postman.setEnvironmentVariable(\"refresh_token\", at.refresh_token);"
+						]
+					}
+				}
+			],
 			"request": {
 				"url": "https://{{host}}/oauth2/token",
 				"method": "POST",
@@ -210,7 +274,7 @@
 			"name": "OAuth Access Code",
 			"request": {
 				"url": {
-					"raw": "https://127.0.0.1:4001/oauth2/authorize?scope=weather&response_type=code&client_id=default&redirect_uri=https://www.getpostman.com/oauth2/callback",
+					"raw": "https://127.0.0.1:4001/oauth2/authorize?scope={{scope}}&response_type=code&client_id={{client_id}}&redirect_uri={{redirect_uri}}",
 					"protocol": "https",
 					"host": [
 						"127",
@@ -226,7 +290,7 @@
 					"query": [
 						{
 							"key": "scope",
-							"value": "weather",
+							"value": "{{scope}}",
 							"equals": true,
 							"description": ""
 						},
@@ -238,13 +302,13 @@
 						},
 						{
 							"key": "client_id",
-							"value": "default",
+							"value": "{{client_id}}",
 							"equals": true,
 							"description": ""
 						},
 						{
 							"key": "redirect_uri",
-							"value": "https://www.getpostman.com/oauth2/callback",
+							"value": "{{redirect_uri}}",
 							"equals": true,
 							"description": ""
 						}
@@ -260,7 +324,100 @@
 					},
 					{
 						"key": "Authorization",
-						"value": "Basic c3Bvb246c3Bvb24=",
+						"value": "Basic {{basic_auth_username}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "response_type",
+							"value": "code",
+							"type": "text"
+						},
+						{
+							"key": "client_id",
+							"value": "default",
+							"type": "text"
+						},
+						{
+							"key": "client_secret",
+							"value": "SECRET",
+							"type": "text"
+						},
+						{
+							"key": "redirect_uri",
+							"value": "https://www.getpostman.com/oauth2/callback",
+							"type": "text"
+						},
+						{
+							"key": "scope",
+							"value": "weather",
+							"type": "text"
+						}
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "OAuth Access Code (auth redirect)",
+			"request": {
+				"url": {
+					"raw": "https://127.0.0.1:4001/redirect/oauth2/authorize?scope={{scope}}&response_type=code&client_id={{client_id}}&redirect_uri={{redirect_uri}}",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "4001",
+					"path": [
+						"redirect",
+						"oauth2",
+						"authorize"
+					],
+					"query": [
+						{
+							"key": "scope",
+							"value": "{{scope}}",
+							"equals": true,
+							"description": ""
+						},
+						{
+							"key": "response_type",
+							"value": "code",
+							"equals": true,
+							"description": ""
+						},
+						{
+							"key": "client_id",
+							"value": "{{client_id}}",
+							"equals": true,
+							"description": ""
+						},
+						{
+							"key": "redirect_uri",
+							"value": "{{redirect_uri}}",
+							"equals": true,
+							"description": ""
+						}
+					],
+					"variable": []
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic {{basic_auth_username}}",
 						"description": ""
 					}
 				],
@@ -302,7 +459,7 @@
 			"name": "OIDC Implicit (Hybrid)",
 			"request": {
 				"url": {
-					"raw": "https://{{host}}/oauth2/authorize?scope=weather&response_type=token%20id_token&client_id={{client_id}}&redirect_uri={{redirect_uri}}",
+					"raw": "https://{{host}}/oauth2/authorize?scope={{scope}}&response_type=token%20id_token&client_id={{client_id}}&redirect_uri={{redirect_uri}}",
 					"protocol": "https",
 					"host": [
 						"{{host}}"
@@ -314,7 +471,7 @@
 					"query": [
 						{
 							"key": "scope",
-							"value": "weather",
+							"value": "{{scope}}",
 							"equals": true,
 							"description": ""
 						},
@@ -348,7 +505,7 @@
 					},
 					{
 						"key": "Authorization",
-						"value": "Basic c3Bvb246c3Bvb24=",
+						"value": "Basic {{basic_auth_username}}",
 						"description": ""
 					}
 				],
@@ -359,7 +516,7 @@
 							"disabled": false,
 							"description": "",
 							"key": "client_secret",
-							"value": "SECRET",
+							"value": "{{client_secret}}",
 							"type": "text"
 						}
 					]
@@ -418,7 +575,139 @@
 					},
 					{
 						"key": "Authorization",
-						"value": "Basic c3Bvb246c3Bvb24=",
+						"value": "Basic {{basic_auth_username}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"disabled": false,
+							"key": "response_type",
+							"value": "code",
+							"type": "text"
+						},
+						{
+							"disabled": false,
+							"key": "client_id",
+							"value": "default",
+							"type": "text"
+						},
+						{
+							"disabled": false,
+							"key": "redirect_uri",
+							"value": "https://www.getpostman.com/oauth2/callback",
+							"type": "text"
+						},
+						{
+							"disabled": false,
+							"key": "scope",
+							"value": "openid weather",
+							"type": "text"
+						}
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "OIDC Access Code (OpenBanking)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var locationHeader = postman.getResponseHeader('Location');",
+							"var queries = locationHeader.split('?')[1].split('&');",
+							"var params = {}",
+							"",
+							"// Convert the array of strings into an object",
+							"for ( i = 0, l = queries.length; i < l; i++ ) {",
+							"    temp = queries[i].split('=');",
+							"    params[temp[0]] = temp[1];",
+							"}",
+							"",
+							"postman.setEnvironmentVariable(\"code\", params['code']);",
+							"postman.setEnvironmentVariable(\"state\", params['state']);",
+							"postman.setEnvironmentVariable(\"id_token\", params['id_token']);",
+							"",
+							"console.log('code=' + params['code']);",
+							"console.log('state=' + params['state']);",
+							"console.log('id_token=' + params['id_token']);"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": {
+					"raw": "https://{{host}}/oauth2/authorize?scope=openid {{scope}}&response_type=id_token%20code&client_id={{client_id}}&redirect_uri={{redirect_uri}}&request=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6Ik96YWlyIFNoZWlraCIsInJvbGUiOiJwcm9kdWN0IG1hbmFnZXIifQ.IsXmqu049JsdCy6mVoVunah3Pvc_aOctSKyrhJHry9s&nonce=abcdef&state=ghijklm",
+					"protocol": "https",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"oauth2",
+						"authorize"
+					],
+					"query": [
+						{
+							"key": "scope",
+							"value": "openid {{scope}}",
+							"equals": true,
+							"description": ""
+						},
+						{
+							"key": "response_type",
+							"value": "id_token%20code",
+							"equals": true,
+							"description": ""
+						},
+						{
+							"key": "client_id",
+							"value": "{{client_id}}",
+							"equals": true,
+							"description": ""
+						},
+						{
+							"key": "redirect_uri",
+							"value": "{{redirect_uri}}",
+							"equals": true,
+							"description": ""
+						},
+						{
+							"key": "request",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6Ik96YWlyIFNoZWlraCIsInJvbGUiOiJwcm9kdWN0IG1hbmFnZXIifQ.IsXmqu049JsdCy6mVoVunah3Pvc_aOctSKyrhJHry9s",
+							"equals": true,
+							"description": ""
+						},
+						{
+							"key": "nonce",
+							"value": "abcdef",
+							"equals": true,
+							"description": ""
+						},
+						{
+							"key": "state",
+							"value": "ghijklm",
+							"equals": true,
+							"description": ""
+						}
+					],
+					"variable": []
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic {{basic_auth_username}}",
 						"description": ""
 					}
 				],
@@ -457,6 +746,22 @@
 		},
 		{
 			"name": "OAuth Code to Token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"postman.clearEnvironmentVariable(\"access_token\");",
+							"postman.clearEnvironmentVariable(\"refresh_token\");",
+							"var at = JSON.parse(responseBody);",
+							"postman.setEnvironmentVariable(\"access_token\", at.access_token);",
+							"postman.setEnvironmentVariable(\"refresh_token\", at.refresh_token);"
+						]
+					}
+				}
+			],
 			"request": {
 				"url": "https://{{host}}/oauth2/token",
 				"method": "POST",
@@ -492,7 +797,7 @@
 						},
 						{
 							"key": "code",
-							"value": "AAL8k4uaJj3PCi7L026rR1BheJkzWKzR7vWgWvo--DBqYRVckkwcLLtZz6ulJygPYzCn0la1ZxjLFk0EApI1ktSJERm6gEnbjqruNQuJbW4NKNG01FcN25ZGi7JmKSlfsPA",
+							"value": "{{code}}",
 							"type": "text"
 						}
 					]
@@ -509,17 +814,17 @@
 				"header": [
 					{
 						"key": "x-ibm-client-id",
-						"value": "default",
+						"value": "{{client_id}}",
 						"description": ""
 					},
 					{
 						"key": "x-ibm-client-secret",
-						"value": "SECRET",
+						"value": "{{client_secret}}",
 						"description": ""
 					},
 					{
 						"key": "Authorization",
-						"value": "Basic c3Bvb246c3Bvb24=",
+						"value": "Basic {{basic_auth_username}}",
 						"description": ""
 					}
 				],
@@ -541,7 +846,7 @@
 					},
 					{
 						"key": "Authorization",
-						"value": "Basic c3Bvb246c3Bvb24=",
+						"value": "Basic {{basic_auth_username}}",
 						"description": ""
 					}
 				],
@@ -551,7 +856,7 @@
 						{
 							"disabled": false,
 							"key": "token_type_hint",
-							"value": "access_token",
+							"value": "{{access_token_type}}",
 							"type": "text"
 						},
 						{
@@ -569,7 +874,7 @@
 						{
 							"disabled": false,
 							"key": "token",
-							"value": "AAEHZGVmYXVsdHVAyQEkaLzeFLos85eBdVuNJzBuko7hRJgQtdvqFomrwCBcq_ufiDFh6LY5Kf8NtQFCNa9B6FPVQKIFcsI-ZKmulJb0-d9mlMKpoO933JgSAaIfDDB7kkKL4IGQ8Nbg3A",
+							"value": "{{access_token}}",
 							"type": "text"
 						}
 					]
@@ -591,7 +896,7 @@
 					},
 					{
 						"key": "Authorization",
-						"value": "Basic c3Bvb246c3Bvb24=",
+						"value": "Basic {{basic_auth_app}}",
 						"description": ""
 					}
 				],
@@ -607,7 +912,7 @@
 						{
 							"disabled": false,
 							"key": "refresh_token",
-							"value": "AAHITNhZfp7u6tsR0JFCfZJEzQpLodFwsHspcwwEtpI29IN8SCK_ktu8Mu1DYV-2yFmJXhTXX6eoC7KJWBPrxO9rQ05HoKGUurZwCXG7PGevVSFCLDhFJqoSV_ZV8tBRAwK3s3jXLTWTnQAQag28hgMb",
+							"value": "{{refresh_token}}",
 							"type": "text"
 						}
 					]
@@ -643,17 +948,17 @@
 				"header": [
 					{
 						"key": "x-ibm-client-id",
-						"value": "default",
+						"value": "{{client_id}}",
 						"description": ""
 					},
 					{
 						"key": "x-ibm-client-secret",
-						"value": "SECRET",
+						"value": "{{client_secret}}",
 						"description": ""
 					},
 					{
 						"key": "Authorization",
-						"value": "Basic c3Bvb246c3Bvb24=",
+						"value": "Basic {{basic_auth_username}}",
 						"description": ""
 					}
 				],
@@ -675,7 +980,7 @@
 					},
 					{
 						"key": "Authorization",
-						"value": "Basic c3Bvb246c3Bvb24=",
+						"value": "Basic {{basic_auth_app}}",
 						"description": ""
 					}
 				],
@@ -684,22 +989,16 @@
 					"urlencoded": [
 						{
 							"disabled": false,
-							"description": {
-								"content": "",
-								"type": "text/plain"
-							},
+							"description": "",
 							"key": "token_type_hint",
-							"value": "refresh_token",
+							"value": "{{refresh_token_type}}",
 							"type": "text"
 						},
 						{
 							"disabled": false,
-							"description": {
-								"content": "",
-								"type": "text/plain"
-							},
+							"description": "",
 							"key": "token",
-							"value": "AAEdQfEGA9wwu6ASDvFA8roYBfnLwGC5qfvRseOCvASV__aVkcz5bWqzjOHTsxctJ_0SwkHiuMB4dUab7jUpFbxTgfqZvXXJSv8IhuppfqwwH8PvpYTaIdNkYly20_2-rt4F9LFlvmHhvMHNCLwQzRkg",
+							"value": "{{refresh_token}}",
 							"type": "text"
 						}
 					]
@@ -721,7 +1020,7 @@
 					},
 					{
 						"key": "Authorization",
-						"value": "{{basic_auth_revocation}}",
+						"value": "Basic {{basic_auth_app}}",
 						"description": ""
 					}
 				],
@@ -736,7 +1035,7 @@
 						},
 						{
 							"key": "token",
-							"value": "AqAIHZGVmYXVsdGO5RWIXBBI5536aRdGjL6QmtHjjxL1HBvlmuKdikHVSOaZA_jqhyIPFzH6ay0QOH5KY0nIe8A-Pi0Zk57H-95PU-Z3RG27tTfOVGHo0uvZV8yuwCQswqYPUGAP5jANzPgh_C5izXJzi46q5HcFshyk",
+							"value": "{{access_token}}",
 							"description": "",
 							"type": "text"
 						}
@@ -782,7 +1081,7 @@
 					},
 					{
 						"key": "Authorization",
-						"value": "Bearer AAEHZGVmYXVsdIX4lOcqAfmg3xnrSMGmiqTLPhcQqFluuLdkWqxsaxudVMSBGBFY4KKdTa8NP7S3tJGi8K1vpDSam86j6W1Feaa-l5VnuKOMETEQTNJNiwVXJl3eUNwDfw67pwpP0dg6e_VcUA1VnjnzDiAHVQyHKm8",
+						"value": "Bearer {{access_token}}",
 						"description": ""
 					}
 				],

@@ -3,29 +3,17 @@ info:
   x-ibm-name: oauth2-oidc-provider
   title: OAuth2 OIDC Provider
   version: 1.0.0
-  description: >-
-    Provide a template on how to enable OIDC for APIC OAuth provider. 
-
-    Authorization Code : the standard OAuth protocol
-
-    Resource Owner Grant Type : the 2 legged owner grant type
-
-    Client Credential : there is no user in this, and thus no id_token will be
-    created
-
-    Skip:
-
-    Implicit : this is a subset of authorization code grant type, public client
+  description: "Provide a template on how to enable OIDC for APIC OAuth provider. \nAuthorization Code : the standard OAuth protocol\nResource Owner Grant Type : the 2 legged owner grant type\nClient Credential : there is no user in this, and thus no id_token will be created\nSkip:\nImplicit : this is a subset of authorization code grant type, public client"
   contact:
-    url: ''
-    name: ''
+    url: 'https://www.ibm.com/support/home/product/I433959L64023U66/IBM_API_Connect'
+    name: IBM
 schemes:
   - https
 host: $(catalog.host)
 basePath: /
 securityDefinitions:
   clientID:
-    description: application's client_id
+    description: "application's client_id"
     in: query
     name: client_id
     type: apiKey
@@ -68,23 +56,17 @@ paths:
         - name: state
           in: query
           type: string
-          description: >-
-            This string will be echoed back to application when user is
-            redirected
+          description: This string will be echoed back to application when user is redirected
           required: false
       responses:
         '200':
           description: An HTML form for authentication or authorization of this request.
         '302':
-          description: >
+          description: |
             Redirect to the clients redirect_uri containing one of the following
-
             - **authorization code** for Authorization code grant
-
             - **access token** for Implicity grant
-
-            - **error** in case of errors, such as the user has denied the
-            request
+            - **error** in case of errors, such as the user has denied the request
       security:
         - clientID: []
     post:
@@ -93,10 +75,8 @@ paths:
       produces:
         - text/html
       summary: submit approval to authorization code or access token
-      description: >
-        Submit resource owners approval (or rejection) for the OAuth2 Server to
-        issue an
-
+      description: |
+        Submit resource owners approval (or rejection) for the OAuth2 Server to issue an
         authorization code or access token to the application.
       security: []
       parameters:
@@ -117,9 +97,7 @@ paths:
           type: string
         - name: redirect_uri
           in: formData
-          description: >-
-            URI the application is requesting this code or token to be
-            redirected to
+          description: URI the application is requesting this code or token to be redirected to
           required: true
           type: string
         - name: original-url
@@ -147,64 +125,31 @@ paths:
       produces:
         - application/json
       summary: Request Access Tokens
-      description: >
-        This endpoint allows requesting an access token following one of the
-        flows below:
-
+      description: |
+        This endpoint allows requesting an access token following one of the flows below:
         - Authorization Code (exchange code for access token)
-
         - Client Credentials (2-legged, there isnt resource owner information)
-
-        - Resource Owner Password Credentials (2-legged, client provides
-        resource owner name and password)
-
+        - Resource Owner Password Credentials (2-legged, client provides resource owner name and password)
         - Refresh Token (exchange refresh token for a new access code)
 
-
-        The table below indicates the required parameters for each specific
-        grant_type options.
-
-        Empty cells indicate a parameter is ignored for that specific grant
-        type.
-
+        The table below indicates the required parameters for each specific grant_type options.
+        Empty cells indicate a parameter is ignored for that specific grant type.
 
         Client authentication:
-
-        - Confidential clients should authenticate using HTTP Basic
-        Authentication. Alternatively, they may post
+        - Confidential clients should authenticate using HTTP Basic Authentication. Alternatively, they may post
           their client_id and client_secret information as a formData parameter.
         - Public clients should send their client_id as formData parameter.
 
-
-        | grant_type           | code       | client_credentials | password    |
-        refresh_token |
-
+        | grant_type           | code       | client_credentials | password    | refresh_token |
         |----------------------|------------|--------------------|-------------|---------------|
-
-        | client_id            | required*  | required*          | required*   |
-        required*     |
-
-        | client_secret        | required*  | required*          | required*   |
-        required*     |
-
-        | code                 | required   |                    |            
-        |               |
-
-        | redirect_uri         | required   |                    |            
-        |               |
-
-        | username             |            |                    | required   
-        |               |
-
-        | password             |            |                    | required   
-        |               |
-
-        | scope                |            | optional           | optional   
-        |               |
-
-        | refresh_token        |            |                    |             |
-        required      |
-
+        | client_id            | required*  | required*          | required*   | required*     |
+        | client_secret        | required*  | required*          | required*   | required*     |
+        | code                 | required   |                    |             |               |
+        | redirect_uri         | required   |                    |             |               |
+        | username             |            |                    | required    |               |
+        | password             |            |                    | required    |               |
+        | scope                |            | optional           | optional    |               |
+        | refresh_token        |            |                    |             | required      |
 
         The implicit grant requests, see /oauth2/authorize.
       security: []
@@ -221,16 +166,12 @@ paths:
             - refresh_token
         - name: client_id
           in: formData
-          description: >-
-            Application client ID, can be provided in formData or using HTTP
-            Basic Authentication
+          description: 'Application client ID, can be provided in formData or using HTTP Basic Authentication'
           required: false
           type: string
         - name: client_secret
           in: formData
-          description: >-
-            Application secret, must be provided in formData or using HTTP Basic
-            Authentication
+          description: 'Application secret, must be provided in formData or using HTTP Basic Authentication'
           required: false
           type: string
         - name: code
@@ -240,10 +181,7 @@ paths:
           type: string
         - name: redirect_uri
           in: formData
-          description: >-
-            required only if the redirect_uri parameter was included in the
-            authorization request /oauth2/authorize; their values MUST be
-            identical.
+          description: required only if the redirect_uri parameter was included in the authorization request /oauth2/authorize; their values MUST be identical.
           required: false
           type: string
         - name: username
@@ -264,9 +202,7 @@ paths:
         - name: refresh_token
           in: formData
           type: string
-          description: >-
-            The refresh token that the client wants to exchange for a new access
-            token (refresh_token grant_type)
+          description: The refresh token that the client wants to exchange for a new access token (refresh_token grant_type)
           required: false
       responses:
         '200':
@@ -293,9 +229,7 @@ paths:
           type: string
         - name: token_type_hint
           in: formData
-          description: >-
-            This must contain 'access_token' or 'refresh_token' to indicate the
-            token type
+          description: "This must contain 'access_token' or 'refresh_token' to indicate the token type"
           required: true
           type: string
       responses:
@@ -321,7 +255,7 @@ paths:
           type: string
         - name: token_type_hint
           in: formData
-          description: This must contain 'access_token' to indicate the token type
+          description: "This must contain 'access_token' to indicate the token type"
           required: true
           type: string
       responses:
@@ -336,11 +270,7 @@ paths:
       produces:
         - application/json
       summary: Returns list of permission granted to the owner
-      description: >
-        This endpoint allows the return of all the issued permission for a given
-        authenticated owner per owner authentication 
-
-        defined in the x-ibm-configuration section
+      description: "This endpoint allows the return of all the issued permission for a given authenticated owner per owner authentication \ndefined in the x-ibm-configuration section\n"
       security:
         - clientIdHeader: []
           clientSecretHeader: []
@@ -377,7 +307,7 @@ x-ibm-configuration:
   oauth2:
     client-type: confidential
     scopes:
-      weather: Banking Information
+      weather: Weather Information
       openid: Enable OIDC
     grants:
       - password
@@ -385,10 +315,10 @@ x-ibm-configuration:
       - application
       - implicit
     identity-extraction:
-      type: default-form
+      type: basic
     authentication:
       x-ibm-authentication-url:
-        url: 'https://192.168.1.66:4002/utility/basic-auth/spoon/spoon'
+        url: 'https://$(api.endpoint.address):9443/utility/basic-auth/spoon/spoon'
         tls-profile: ''
     authorization:
       type: authenticated
@@ -419,81 +349,21 @@ x-ibm-configuration:
       - switch:
           title: switch
           case:
-            - condition: >-
-                (((request.verb==='GET')&&(api.operation.path==='/oauth2/authorize'))||((request.verb==='POST')&&(api.operation.path==='/oauth2/authorize'))
-                && new String (apim.getvariable
-                ('message.status.code')).startsWith ('302'))
+            - condition: "(((request.verb==='GET')&&(api.operation.path==='/oauth2/authorize'))||((request.verb==='POST')&&(api.operation.path==='/oauth2/authorize')) && new String (apim.getvariable ('message.status.code')).startsWith ('302'))"
               execute:
                 - xslt:
                     title: xslt
                     input: false
                     version: 1.0.0
-                    source: >-
-                      <xsl:stylesheet
-                      xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                      version="1.0"
-                        xmlns:dp="http://www.datapower.com/extensions"
-                        xmlns:apim="http://www.ibm.com/apimanagement"
-                        extension-element-prefixes="dp apim"
-                        exclude-result-prefixes="dp apim">
-                        
-                        <xsl:include href="local:///isp/policy/apim.setvariable-impl.xsl" dp:ignore-multiple="yes"/>
-                        
-                        <xsl:template match="/">
-                          <xsl:choose>
-                            <xsl:when test="string(dp:variable('var://context/_apimgmt/multi-response-type')) != '' and
-                                            (contains(dp:http-response-header('Location'), '?code=') or
-                                             contains(dp:http-response-header('Location'), '&amp;code='))">
-                              <xsl:call-template name="apim:setVariableImpl">
-                                <xsl:with-param name="rawName" select="'oidc-location'"/>
-                                <xsl:with-param name="rawValue" select="dp:http-response-header('Location')"/>
-                                <xsl:with-param name="action" select="'set'"/>
-                              </xsl:call-template>
-                              <xsl:call-template name="apim:setVariableImpl">
-                                <xsl:with-param name="rawName" select="'oidc-credential'"/>
-                                <xsl:with-param name="rawValue" select="string(dp:variable('var://context/_apimgmt/authenticated-username'))"/>
-                                <xsl:with-param name="action" select="'set'"/>
-                              </xsl:call-template>
-                            </xsl:when>  <!-- temporary az code -->
-                            
-                            <xsl:when test="starts-with(dp:http-response-header('x-dp-response-code'), '302') and
-                                            contains(dp:http-response-header('Location'), 'access_token')">
-                              <xsl:variable name="scope" select="substring-before(substring-after(dp:http-response-header('Location'), 'scope='), '&amp;')"/>
-                               <xsl:if test="($scope = 'openid') or
-                                              contains($scope, '+openid+') or
-                                              starts-with($scope, 'openid+') or
-                                              ends-with($scope, '+openid')">
-                                <xsl:call-template name="apim:setVariableImpl">
-                                  <xsl:with-param name="rawName" select="'oidc-location'"/>
-                                  <xsl:with-param name="rawValue" select="dp:http-response-header('Location')"/>
-                                  <xsl:with-param name="action" select="'set'"/>
-                                </xsl:call-template>
-                                <xsl:call-template name="apim:setVariableImpl">
-                                  <xsl:with-param name="rawName" select="'oidc-credential'"/>
-                                  <xsl:with-param name="rawValue" select="string(dp:variable('var://context/_apimgmt/authenticated-username'))"/>
-                                  <xsl:with-param name="action" select="'set'"/>
-                                </xsl:call-template>
-                              </xsl:if>
-                            </xsl:when>
-                            
-                            <xsl:otherwise/>
-
-                          </xsl:choose>
-                          
-                        </xsl:template>
-                      </xsl:stylesheet>
-            - condition: >-
-                ((request.verb==='POST')&&(api.operation.path==='/oauth2/token'))
+                    source: "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"1.0\"\n  xmlns:dp=\"http://www.datapower.com/extensions\"\n  xmlns:apim=\"http://www.ibm.com/apimanagement\"\n  extension-element-prefixes=\"dp apim\"\n  exclude-result-prefixes=\"dp apim\">\n  \n  <xsl:include href=\"local:///isp/policy/apim.setvariable-impl.xsl\" dp:ignore-multiple=\"yes\"/>\n  \n  <xsl:template match=\"/\">\n    <xsl:choose>\n      <xsl:when test=\"string(dp:variable('var://context/_apimgmt/multi-response-type')) != '' and\n                      (contains(dp:http-response-header('Location'), '?code=') or\n                       contains(dp:http-response-header('Location'), '&amp;code='))\">\n        <xsl:call-template name=\"apim:setVariableImpl\">\n          <xsl:with-param name=\"rawName\" select=\"'oidc-location'\"/>\n          <xsl:with-param name=\"rawValue\" select=\"dp:http-response-header('Location')\"/>\n          <xsl:with-param name=\"action\" select=\"'set'\"/>\n        </xsl:call-template>\n        <xsl:call-template name=\"apim:setVariableImpl\">\n          <xsl:with-param name=\"rawName\" select=\"'oidc-credential'\"/>\n          <xsl:with-param name=\"rawValue\" select=\"string(dp:variable('var://context/_apimgmt/authenticated-username'))\"/>\n          <xsl:with-param name=\"action\" select=\"'set'\"/>\n        </xsl:call-template>\n      </xsl:when>  <!-- temporary az code -->\n      \n      <xsl:when test=\"starts-with(dp:http-response-header('x-dp-response-code'), '302') and\n                      contains(dp:http-response-header('Location'), 'access_token')\">\n        <xsl:variable name=\"scope\" select=\"substring-before(substring-after(dp:http-response-header('Location'), 'scope='), '&amp;')\"/>\n         <xsl:if test=\"($scope = 'openid') or\n                        contains($scope, '+openid+') or\n                        starts-with($scope, 'openid+') or\n                        ends-with($scope, '+openid')\">\n          <xsl:call-template name=\"apim:setVariableImpl\">\n            <xsl:with-param name=\"rawName\" select=\"'oidc-location'\"/>\n            <xsl:with-param name=\"rawValue\" select=\"dp:http-response-header('Location')\"/>\n            <xsl:with-param name=\"action\" select=\"'set'\"/>\n          </xsl:call-template>\n          <xsl:call-template name=\"apim:setVariableImpl\">\n            <xsl:with-param name=\"rawName\" select=\"'oidc-credential'\"/>\n            <xsl:with-param name=\"rawValue\" select=\"string(dp:variable('var://context/_apimgmt/authenticated-username'))\"/>\n            <xsl:with-param name=\"action\" select=\"'set'\"/>\n          </xsl:call-template>\n        </xsl:if>\n      </xsl:when>\n      \n      <xsl:otherwise/>\n\n    </xsl:choose>\n    \n  </xsl:template>\n</xsl:stylesheet>"
+            - condition: "((request.verb==='POST')&&(api.operation.path==='/oauth2/token'))"
               execute:
                 - gatewayscript:
                     title: gatewayscript
                     version: 1.0.0
-                    source: >-
+                    source: |-
                       var _apimgmt = session.name('_apimgmt');
-
-                      var grantType =
-                      _apimgmt.getVariable('requested-grant-type');
-
+                      var grantType = _apimgmt.getVariable('requested-grant-type');
 
                       if (grantType === 'password' ||
                           grantType === 'code') {
@@ -509,81 +379,13 @@ x-ibm-configuration:
           version: 1.0.0
       - if:
           title: if
-          condition: apim.getvariable('oidc-credential') !== undefined
+          condition: "apim.getvariable('oidc-credential') !== undefined"
           execute:
             - xslt:
                 title: xslt
                 input: false
                 version: 1.0.0
-                source: >-
-                  <xsl:stylesheet
-                  xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
-                    xmlns:dp="http://www.datapower.com/extensions"
-                    xmlns:apim="http://www.ibm.com/apimanagement"
-                    xmlns:dpfunc="http://www.datapower.com/extensions/functions"
-                    xmlns:str="http://exslt.org/strings" 
-                    extension-element-prefixes="dp apim dpfunc str"
-                    exclude-result-prefixes="dp apim dpfunc str">
-                    
-                    <xsl:include href="local:///isp/policy/apim.setvariable-impl.xsl" dp:ignore-multiple="yes"/>
-                    <xsl:include href="store:///utilities.xsl" dp:ignore-multiple="yes"/>
-                    
-                    <xsl:template match="/">
-                      <!-- calculate at_hash, c_hash, and s_hash -->
-                      <!-- DP Firmware release 760 contain context variable
-                            var://context/AAA/oauth-token which will 
-                            provide the input data and output data for token generation
-                            IMPORTANT : make sure the algorithm is the same algorithm JWT will be used
-                      -->
-
-                      <xsl:variable name="algorithm" select="apim:getVariableImpl('jwt.sign.algorithm','false')"/>
-                      <xsl:variable name="oauth-data" select="dp:variable('var://context/AAA/oauth-token')"/>
-                      <xsl:variable name="token-claim">
-                        <xsl:text>{</xsl:text>
-                        <xsl:choose>
-                          <xsl:when test="$oauth-data/output/result/code != ''">
-                            <xsl:text>&quot;c_hash&quot;:&quot;</xsl:text>
-                            <xsl:value-of select="dpfunc:access_token-2-at_hash($oauth-data/output/result/code, $algorithm)"/>
-                            <xsl:text>&quot;,</xsl:text>
-                          </xsl:when>
-                          <xsl:when test="$oauth-data/output/result/access_token != ''">
-                            <xsl:text>&quot;at_hash&quot;:&quot;</xsl:text>
-                            <xsl:value-of select="dpfunc:access_token-2-at_hash($oauth-data/output/result/access_token, $algorithm)"/>
-                            <xsl:text>&quot;,</xsl:text>
-                          </xsl:when>
-                          <xsl:otherwise/>
-                        </xsl:choose>
-                        <xsl:choose>
-                          <xsl:when test="dp:variable('var://context/_apimgmt/oauth/request')/request/args/arg[@name='state'] != ''">
-                            <xsl:text>&quot;s_hash&quot;:&quot;</xsl:text>
-                            <xsl:value-of select="dpfunc:access_token-2-at_hash(dp:variable('var://context/_apimgmt/oauth/request')/request/args/arg[@name='state'], $algorithm)"/>
-                            <xsl:text>&quot;,</xsl:text> 
-                          </xsl:when>
-                          <xsl:when test="dp:variable('var://context/_apimgmt/oauth/request')/request/args/arg[@name='dp-data'] != '' and
-                                          not(ends-with(dp:variable('var://context/_apimgmt/oauth/request')/request/args/arg[@name='dp-data'], ':'))">
-                            <xsl:text>&quot;s_hash&quot;:&quot;</xsl:text>
-                            <xsl:value-of select="dpfunc:access_token-2-at_hash(str:tokenize(dp:variable('var://context/_apimgmt/oauth/request')/request/args/arg[@name='dp-data'],':')[last()], $algorithm)"/>
-                            <xsl:text>&quot;,</xsl:text>           
-                            <!-- last part of the dp-data is state -->
-                          </xsl:when>
-                          <xsl:otherwise/>
-                        </xsl:choose>
-                        
-                        <!-- does request contain nonce -->
-                        <xsl:if test="dp:variable('var://context/_apimgmt/oidc-nonce') != ''">
-                          <xsl:text>&quot;nonce&quot;:&quot;</xsl:text>
-                          <xsl:value-of select="dp:variable('var://context/_apimgmt/oidc-nonce')"/>
-                          <xsl:text>&quot;,</xsl:text>
-                        </xsl:if>
-                        <xsl:text>&quot;disclaimer&quot;:&quot;For OpenBanking OIDC demo purpose&quot;}</xsl:text>
-                      </xsl:variable>
-                      <xsl:call-template name="apim:setVariableImpl">
-                        <xsl:with-param name="rawName" select="'added.claim'"/>
-                        <xsl:with-param name="rawValue" select="$token-claim"/>
-                        <xsl:with-param name="action" select="'set'"/>
-                      </xsl:call-template>
-                    </xsl:template>
-                  </xsl:stylesheet>
+                source: "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"1.0\"\n  xmlns:dp=\"http://www.datapower.com/extensions\"\n  xmlns:apim=\"http://www.ibm.com/apimanagement\"\n  xmlns:dpfunc=\"http://www.datapower.com/extensions/functions\"\n  xmlns:str=\"http://exslt.org/strings\" \n  extension-element-prefixes=\"dp apim dpfunc str\"\n  exclude-result-prefixes=\"dp apim dpfunc str\">\n  \n  <xsl:include href=\"local:///isp/policy/apim.setvariable-impl.xsl\" dp:ignore-multiple=\"yes\"/>\n  <xsl:include href=\"store:///utilities.xsl\" dp:ignore-multiple=\"yes\"/>\n  \n  <xsl:template match=\"/\">\n    <!-- calculate at_hash, c_hash, and s_hash -->\n    <!-- DP Firmware release 760 contain context variable\n          var://context/AAA/oauth-token which will \n          provide the input data and output data for token generation\n          IMPORTANT : make sure the algorithm is the same algorithm JWT will be used\n    -->\n\n    <xsl:variable name=\"algorithm\" select=\"apim:getVariableImpl('jwt.sign.algorithm','false')\"/>\n    <xsl:variable name=\"oauth-data\" select=\"dp:variable('var://context/AAA/oauth-token')\"/>\n    <xsl:variable name=\"token-claim\">\n      <xsl:text>{</xsl:text>\n      <xsl:choose>\n        <xsl:when test=\"$oauth-data/output/result/code != ''\">\n          <xsl:text>&quot;c_hash&quot;:&quot;</xsl:text>\n          <xsl:value-of select=\"dpfunc:access_token-2-at_hash($oauth-data/output/result/code, $algorithm)\"/>\n          <xsl:text>&quot;,</xsl:text>\n        </xsl:when>\n        <xsl:when test=\"$oauth-data/output/result/access_token != ''\">\n          <xsl:text>&quot;at_hash&quot;:&quot;</xsl:text>\n          <xsl:value-of select=\"dpfunc:access_token-2-at_hash($oauth-data/output/result/access_token, $algorithm)\"/>\n          <xsl:text>&quot;,</xsl:text>\n        </xsl:when>\n        <xsl:otherwise/>\n      </xsl:choose>\n      <xsl:choose>\n        <xsl:when test=\"dp:variable('var://context/_apimgmt/oauth/request')/request/args/arg[@name='state'] != ''\">\n          <xsl:text>&quot;s_hash&quot;:&quot;</xsl:text>\n          <xsl:value-of select=\"dpfunc:access_token-2-at_hash(dp:variable('var://context/_apimgmt/oauth/request')/request/args/arg[@name='state'], $algorithm)\"/>\n          <xsl:text>&quot;,</xsl:text> \n        </xsl:when>\n        <xsl:when test=\"dp:variable('var://context/_apimgmt/oauth/request')/request/args/arg[@name='dp-data'] != '' and\n                        not(ends-with(dp:variable('var://context/_apimgmt/oauth/request')/request/args/arg[@name='dp-data'], ':'))\">\n          <xsl:text>&quot;s_hash&quot;:&quot;</xsl:text>\n          <xsl:value-of select=\"dpfunc:access_token-2-at_hash(str:tokenize(dp:variable('var://context/_apimgmt/oauth/request')/request/args/arg[@name='dp-data'],':')[last()], $algorithm)\"/>\n          <xsl:text>&quot;,</xsl:text>           \n          <!-- last part of the dp-data is state -->\n        </xsl:when>\n        <xsl:otherwise/>\n      </xsl:choose>\n      \n      <!-- does request contain nonce -->\n      <xsl:if test=\"dp:variable('var://context/_apimgmt/oidc-nonce') != ''\">\n        <xsl:text>&quot;nonce&quot;:&quot;</xsl:text>\n        <xsl:value-of select=\"dp:variable('var://context/_apimgmt/oidc-nonce')\"/>\n        <xsl:text>&quot;,</xsl:text>\n      </xsl:if>\n      <xsl:text>&quot;disclaimer&quot;:&quot;For OpenBanking OIDC demo purpose&quot;}</xsl:text>\n    </xsl:variable>\n    <xsl:call-template name=\"apim:setVariableImpl\">\n      <xsl:with-param name=\"rawName\" select=\"'added.claim'\"/>\n      <xsl:with-param name=\"rawValue\" select=\"$token-claim\"/>\n      <xsl:with-param name=\"action\" select=\"'set'\"/>\n    </xsl:call-template>\n  </xsl:template>\n</xsl:stylesheet>"
             - jwt-generate:
                 title: jwt-generate
                 iss-claim: iss.claim
@@ -599,10 +401,8 @@ x-ibm-configuration:
             - gatewayscript:
                 title: gatewayscript
                 version: 1.0.0
-                source: >-
-                  var grantType =
-                  session.name('_apimgmt').getVariable('requested-grant-type');
-
+                source: |-
+                  var grantType = session.name('_apimgmt').getVariable('requested-grant-type');
 
                   if (grantType === 'implicit') {
                     // regression in 5070 will not allow access, and modification to the location header
@@ -610,7 +410,6 @@ x-ibm-configuration:
                     // work around is to use xslt
                     apim.setvariable('oidc-location', location);
                   }
-
                   else {
                     if (apim.getvariable('oidc-location') !== undefined && apim.getvariable('oidc-location').indexOf('code=') !== -1) {
                       var location = apim.getvariable('oidc-location') + '&id_token=' + apim.getvariable("idtoken");
@@ -624,17 +423,14 @@ x-ibm-configuration:
                   }
             - if:
                 title: if
-                condition: >-
-                  new String
-                  (apim.getvariable('message.status.code')).startsWith('302')
+                condition: "new String (apim.getvariable('message.status.code')).startsWith('302')"
                 execute:
                   - xslt:
                       title: xslt
                       input: false
                       version: 1.0.0
-                      source: >
-                        <xsl:stylesheet
-                        xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                      source: |
+                        <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                           version="1.0"
                           xmlns:dp="http://www.datapower.com/extensions"
                           xmlns:apim="http://www.ibm.com/apimanagement"
@@ -651,12 +447,7 @@ x-ibm-configuration:
     catch: []
   properties:
     JWSSignPrivateKey:
-      value: >-
-        {   "kty": "RSA",   "d":
-        "IcXNi8cf4MPHgjpJTklPa6debT2OYC8UVGyk9ZdM883Pin8_wLazOOKPeF7oQz8gX6ZCNfe1X_PBo4pCsJvajsp8PNO1LxXOvnE_aRUQUR4MdWv4GmPMxuFluKpYpg3US9Xa8FYoHDtYjunp0f5r_Rmr-4L_3pxLHDHk97NQCpJjpNXUgP1WbiTjZ6qNbMNEaUKoexiIXjuaTsgtheSHh4EKPMLWdlmwK5ma5lALzmEwdCc878pcS4WaULVOxCQ8N7XUwz2A823Iax8sZ0c7ZAMyjjEW7Gx9IUBTc8s9lUjrxvKzRXPdjL2q-g6sVnvYvo9hE-XLCY5Yir3w0PEn2Gpvi-YbO5IZ0CynT-ohPOWPkD7ciWpWZQIPq8i84412UAfVlIijgPEKQNdH4wFIFSPcaSmoZbMkxdFKVIJJQF_6_onWqpS5wTNCk6R0EkfFMX-k7yqPXgmTcJkKetovPaFxVse-PWVzbdzX0Y7WOQ24DCoyqDxJ5pqqzmtbFHEDO-eGL8ikRm3PMyGjyHX8mffBg7uQxKfSvciPbic_lZQaRqAROVvFMHQjQni7su1qLJPdcCeb9abGjnjYRb_7Riuw7JgmPdw82TYtOLMdiNmraOcsVA18mHvMY57I5KQ5JyJqdm7Q4-lysCzuFplzH5nOolmArCKJG7cA1_-hS4E",  
-        "e": "AQAB",   "use": "sig",   "kid": "spoon",   "alg": "RS512",   "n":
-        "nNekmaBt236y5xI0ZoFo3r6WJH-hVnK6-_RFHrLW_GwIkWScu-iPqns3osztdo5Js36VHqf4TV87DZE82_uO_u40YKbuDiGhKmBS6JIqfRFe-XombaPUqAVz_fgv5f68jBWZ8cwy1kRLpqXkD9KvOruqeG9fOyQq0hYUfdQFxECxeTS0Xl1N_sELQdl9Ou7lhjk18hYfLe5zII2THxgLP24JP4L2AgjTZcO--434bMn-EK8KSUZ1qGEMmF_F1M6qAzrbTYmnfaewV8sFV25X2_vD8Y28CVmR9FgH6VY6o9GUUKlmmx9mwmFfodgPxFtqITxdhQ8S2rpg0WMvSlbxqtolD91MsXeiqvWGCuQmb3CUzJrMPb5XEgt-6l4WvT2_FffBHaRvpSLw-cVN6TauL1SusFsN0plkuapJQBccfHgU4tS51NvlXJ2ISueUVK5vKlBywfxe5V9EHE0EJ0V3fBA--bL5NBQHlLP7MnqV0BXGDHnwaZJ3160w2wDGGW7NxwTUNwtsJgNg_k9kAqm4vWsttxUE-HdF1cprCl-jyuDnCOv6AHCWi6oQF1X13FtegWq8rNwEA_S_qnd_Qmhs8g5IFvBVaAWBmnbNd8TMdGNfLoSXbUlWnu1_JPIdIiWrAEsw-nhwDl7h7_9JGbfpMC8DEi3zWNvEc5erpNZAAp0"
-        }
+      value: '{   "kty": "RSA",   "d": "ZgiybjfeIsoihPMRQpT9Yv5Qfvg5AaqdGRK8mb1G73_CrOjpTbXjs7t0AKKNTGFUlvla4ag9kof4qzA7EB0Kgpsn05668sQtenIkz83pP1v7MaM31YovGq1WCmCpV8lJvuaSAP06ueRmEYG5zhtT9lK3TVxvuYwCd_Ukfe0M3R3ajyLEvPLhnwS5mybAj0mP5lat1l29qXhC-WNhDRZfl6NdVge4yGyKLsNAXqWw0bi3ARE3dYPt7J36cqoET4agwOjjupxY8Ctv1tFw7Xj3lcUBciT_tYi3tKVs8ALalTQ-MHOXHEdDXaAxzgmLVgFD05bbE55OL25MLSvoD0bLAQ",   "e": "AQAB",   "use": "sig",   "kid": "spoon",   "alg": "RS256",   "n": "iE7cj97VkW-QXXU0U9Fedjl7digjnp_R7lx6LHLugHfS5Xp26GCxOO1pNktSHsfof5EMJ0y8iqtIH4X3QYLg6E6fEZQD4-ZpIaKhTDuel1Zls_NRFgrQ0gzB3oiNJbNMfbNLpx4hCauRRv_RqRb1__jkBRIiU3MrEmB6gBDBQYJ9vwcYDXT5qowAopoZk6p1bf6kftMswVoFsILt9XdBynTHcLPyj61mP0faUb5_VRkpXaCbyCn4G1XakKswqzSkULImNQykaK_I6IJ0CGI0gnnx5YmwNbo4AYS-8fDODXfThDZC12TM_BlCGQMAao2jSSXaebI1nyxmgaYV1oChbw" }'
       description: ''
       encoded: false
     OIDCIssuer:
@@ -776,3 +567,6 @@ definitions:
     type: array
     items:
       $ref: '#/definitions/issued_response'
+externalDocs:
+  url: 'https://www.ibm.com/support/knowledgecenter/SSMNED_5.0.0/com.ibm.apic.toolkit.doc/tapic_sec_api_config_oidc.html'
+  description: Securing your APIs with OpenID Connect

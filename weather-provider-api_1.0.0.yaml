@@ -43,14 +43,6 @@ paths:
           description: Profile information for a user
           schema:
             $ref: '#/definitions/Today'
-  /info:
-    get:
-      responses:
-        '200':
-          description: 200 OK
-      security:
-        - oAuthOnly:
-            - weather
 definitions:
   Today:
     type: object
@@ -154,33 +146,6 @@ x-ibm-configuration:
                     source: >-
                       apim.setvariable('message.body',
                       apim.getvariable('decoded.claims'));
-            - operations:
-                - verb: get
-                  path: /info
-              execute:
-                - gatewayscript:
-                    title: gatewayscript
-                    version: 1.0.0
-                    source: >-
-                      var output = {"info":"version.1.0"};
-
-                      output.dependency = "using IBM BlueMix weather api";
-
-                      output.dependency_url =
-                      "https://myweatherprovider.mybluemix.net/";
-
-                      output.whoami = apim.getContext('api.endpoint.address');
-
-                      var reqauth =
-                      apim.getvariable('request.authorization').split(' ');
-
-                      output.access_token = reqauth[1];
-
-                      session.output.write(JSON.stringify(output));
-
-                      apim.setvariable('message.status.code', 200);  
-
-                      apim.output('application/json');
           otherwise: []
           version: 1.0.0
     catch:
@@ -198,36 +163,40 @@ x-ibm-configuration:
 consumes:
   - application/json
 securityDefinitions:
+  oauth-third-party:
+    type: oauth2
+    description: ''
+    flow: accessCode
+    scopes: {}
+    authorizationUrl: ''
+    x-tokenIntrospect:
+      url: 'https://127.0.0.1:9443/utility/third-party-oauth/introspect'
   api-key-1:
     type: apiKey
     description: ''
     in: header
     name: X-IBM-Client-Id
-  oAuthOnly:
-    type: oauth2
-    description: ''
-    flow: accessCode
-    scopes:
-      weather: ''
-      scope1: ''
-    authorizationUrl: >-
-      https://api.us.apiconnect.ibmcloud.com/ozairscaibmcom-dev/sb/oauth2/authorize
-    tokenUrl: 'https://api.us.apiconnect.ibmcloud.com/ozairscaibmcom-dev/sb/oauth2/token'
-    x-scopeValidate:
-      url: ''
-    x-tokenIntrospect:
-      url: ''
   oauth-accesscode:
     type: oauth2
     description: ''
     flow: accessCode
-    authorizationUrl: >-
-      https://api.us.apiconnect.ibmcloud.com/ozairscaibmcom-dev/sb/oauth2/authorize
+    authorizationUrl: 'https://localhost:4001/oauth2/authorize'
     scopes:
       weather: ''
       openid: ''
-    tokenUrl: 'https://api.us.apiconnect.ibmcloud.com/ozairscaibmcom-dev/sb/oauth2/token'
+    tokenUrl: 'https://localhost:4001/oauth2/token'
+  oauth-password:
+    type: oauth2
+    description: ''
+    flow: password
+    scopes:
+      openid: ''
+      weather: ''
+    tokenUrl: 'https://localhost:4001/oauth2/token'
 security:
+  - oauth-third-party: []
+    api-key-1: []
   - api-key-1: []
-  - oAuthOnly:
+    oauth-accesscode:
       - weather
+      - openid

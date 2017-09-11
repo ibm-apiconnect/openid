@@ -30,7 +30,7 @@ x-ibm-configuration:
             - set: demo.owner.x-selected-scope
               value: 'read:8888-8888'
             - set: demo.authenticate-url.x-selected-scope
-              value: mutual
+              value: mutual openid weather
             - set: demo.identity.redirect.username
               value: spoon
             - set: demo.identity.redirect.confirmation
@@ -43,7 +43,7 @@ x-ibm-configuration:
             - set: demo.introspect.response.scope
               value: spoon fork knief
             - set: demo.authenticate-url.x-selected-scope-w-desc
-              value: '{"mutual":"Mutual Fund"}'
+              value: ''
           version: 1.0.0
           description: This set up value for the http response for the demo purpose
       - switch:
