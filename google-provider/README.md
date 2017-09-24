@@ -93,8 +93,10 @@ apim.readInputAsBuffer(function (error, buffer) {
     }
   }
 });
-```
-  - apic for the provider api, it will configure introspection url to the microservice
+  ```
+  - The actual API is configued to use introspection url to the microservice to verify the access_token provided by Google.  There are 2 security requirements
+    1. api-key-1 : this is for identify the IBM APIc credential
+    2. GoogleOAuthProvider : this configures the introspect call out to verify the access_token from Google
 
   ```
 securityDefinitions:
