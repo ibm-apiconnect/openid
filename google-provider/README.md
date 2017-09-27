@@ -93,8 +93,10 @@ apim.readInputAsBuffer(function (error, buffer) {
     }
   }
 });
-```
-  - apic for the provider api, it will configure introspection url to the microservice
+  ```
+  - The actual API is configued to use introspection url.  The introspect url will call the microservice.  The role of the micorservice is to do payload translation, and issue a call to google.  The microservice will receive a response from google, and convert the response to conform to the IETF, https://tools.ietf.org/html/rfc7662.  There are 2 security requirements needed on the API.
+    1. api-key-1 : this is for identify the IBM APIc credential
+    2. GoogleOAuthProvider : this configures the introspect call out to verify the access_token from Google
 
   ```
 securityDefinitions:
