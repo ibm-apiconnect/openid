@@ -163,14 +163,6 @@ x-ibm-configuration:
 consumes:
   - application/json
 securityDefinitions:
-  oauth-third-party:
-    type: oauth2
-    description: ''
-    flow: accessCode
-    scopes: {}
-    authorizationUrl: ''
-    x-tokenIntrospect:
-      url: 'https://127.0.0.1:9443/utility/third-party-oauth/introspect'
   api-key-1:
     type: apiKey
     description: ''
@@ -180,22 +172,12 @@ securityDefinitions:
     type: oauth2
     description: ''
     flow: accessCode
-    authorizationUrl: 'https://localhost:4001/oauth2/authorize'
+    authorizationUrl: 'https://$(api.endpoint.address):9443/oauth2/authorize'
     scopes:
       weather: ''
       openid: ''
-    tokenUrl: 'https://localhost:4001/oauth2/token'
-  oauth-password:
-    type: oauth2
-    description: ''
-    flow: password
-    scopes:
-      openid: ''
-      weather: ''
-    tokenUrl: 'https://localhost:4001/oauth2/token'
+    tokenUrl: 'https://$(api.endpoint.address):9443/oauth2/token'
 security:
-  - oauth-third-party: []
-    api-key-1: []
   - api-key-1: []
     oauth-accesscode:
       - weather

@@ -274,15 +274,11 @@
 			"name": "OAuth Access Code",
 			"request": {
 				"url": {
-					"raw": "https://127.0.0.1:4001/oauth2/authorize?scope={{scope}}&response_type=code&client_id={{client_id}}&redirect_uri={{redirect_uri}}",
+					"raw": "https://{{host}}/oauth2/authorize?scope={{scope}}&response_type=code&client_id={{client_id}}&redirect_uri={{redirect_uri}}",
 					"protocol": "https",
 					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
+						"{{host}}"
 					],
-					"port": "4001",
 					"path": [
 						"oauth2",
 						"authorize"
@@ -366,15 +362,11 @@
 			"name": "OAuth Access Code (auth redirect)",
 			"request": {
 				"url": {
-					"raw": "https://127.0.0.1:4001/redirect/oauth2/authorize?scope={{scope}}&response_type=code&client_id={{client_id}}&redirect_uri={{redirect_uri}}",
+					"raw": "https://{{host}}/redirect/oauth2/authorize?scope={{scope}}&response_type=code&client_id={{client_id}}&redirect_uri={{redirect_uri}}",
 					"protocol": "https",
 					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
+						"{{host}}"
 					],
-					"port": "4001",
 					"path": [
 						"redirect",
 						"oauth2",
@@ -621,22 +613,25 @@
 						"type": "text/javascript",
 						"exec": [
 							"var locationHeader = postman.getResponseHeader('Location');",
-							"var queries = locationHeader.split('?')[1].split('&');",
-							"var params = {}",
 							"",
-							"// Convert the array of strings into an object",
-							"for ( i = 0, l = queries.length; i < l; i++ ) {",
-							"    temp = queries[i].split('=');",
-							"    params[temp[0]] = temp[1];",
-							"}",
-							"",
-							"postman.setEnvironmentVariable(\"code\", params['code']);",
-							"postman.setEnvironmentVariable(\"state\", params['state']);",
-							"postman.setEnvironmentVariable(\"id_token\", params['id_token']);",
-							"",
-							"console.log('code=' + params['code']);",
-							"console.log('state=' + params['state']);",
-							"console.log('id_token=' + params['id_token']);"
+							"if (locationHeader && locationHeader.length > 0) {",
+							"    var queries = locationHeader.split('?')[1].split('&');",
+							"    var params = {}",
+							"    ",
+							"    // Convert the array of strings into an object",
+							"    for ( i = 0, l = queries.length; i < l; i++ ) {",
+							"        temp = queries[i].split('=');",
+							"        params[temp[0]] = temp[1];",
+							"    }",
+							"    ",
+							"    postman.setEnvironmentVariable(\"code\", params['code']);",
+							"    postman.setEnvironmentVariable(\"state\", params['state']);",
+							"    postman.setEnvironmentVariable(\"id_token\", params['id_token']);",
+							"    ",
+							"    console.log('code=' + params['code']);",
+							"    console.log('state=' + params['state']);",
+							"    console.log('id_token=' + params['id_token']);",
+							"}"
 						]
 					}
 				}
