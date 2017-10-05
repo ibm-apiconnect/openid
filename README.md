@@ -51,7 +51,9 @@ These instructions assume you are familiar with the basic steps of the API desig
  * OIDCIssuer: string to represent the issuer of the token (default value is IBM APIc)
  * JWSSignPrivateKey: string to represent the private key used to sign the JWT token
  * JWSAlgorithm: algorithm used during the signing process
-7. Click the **Assemble** tab at the top. You will notice several policies that control the generation of the JWT token for OIDC flows. The `set-variable` uses the variables defined in the **Properties** section. 
+7. Click the **Assemble** tab at the top. You will notice several policies that control the generation of the JWT token for OIDC flows. The `set-variable` uses the variables defined in the **Properties** section.
+ * `set-variable` contains `oidc.custom.claim` that can be used to inject your custom claim, this variable must be set before the `JWT Generator` policy
+   * `oidc.custom.claim` can be set using either a `GatewayScript` or `XSLT` policy
 8. When using the API Connect developer toolkit with OAuth Access code flow, you will need to redirect the application to an OAuth client to exchange the authorization code for an access code. This is typically done in an OAuth application, but we can use a couple of techniques to streamline testing.
 9. Configure environment for OAuth Access Code 
 	* Open a command prompt within the project directory (ie same directory as the project yaml files). Enter the command `apic config:set oauth-redirect-uri=https://www.getpostman.com/oauth2/callback`. 
