@@ -485,19 +485,22 @@ x-ibm-configuration:
                     title: gatewayscript
                     version: 1.0.0
                     source: >-
-                      var _apimgmt = session.name('_apimgmt');
-
-                      var grantType =
-                      _apimgmt.getVariable('requested-grant-type');
-
-
-                      if (grantType === 'password' ||
-                          grantType === 'code') {
+                      let _apimgmt = session.name('_apimgmt');
+                      let grantType = _apimgmt.getVariable('requested-grant-type');
+                      if (grantType === 'password' || grantType === 'code') {
                         // get scope
                         var splitScope = (apim.getvariable('message.body').scope || '').split(' ');
-                        for (var i = 0; i < splitScope.length; i++) {
+                        if (splitScope.length === 0) {
+                          var vScopeNode = session.name('INPUT').getVariable('oauth/verified-scope').item(0).childNodes;
+                          if (vScopeNode !== undefined && vScopeNode !== null) {
+                            let vScope = vScopeNode.item(0).textContent;
+                            splitScope = vScope.split(' ');
+                          }
+                        }
+
+                        for (let i = 0; i < splitScope.length; i++) {
                           if (splitScope[i] === 'openid') {
-                            var userIdentity = _apimgmt.getVariable('authenticated-username');
+                            let userIdentity = _apimgmt.getVariable('authenticated-username');
                             apim.setvariable('oidc-credential', userIdentity, 'set');
                           }
                         }
@@ -627,24 +630,24 @@ x-ibm-configuration:
                 title: gatewayscript
                 version: 1.0.0
                 source: >-
-                  var grantType =
+                  let grantType =
                   session.name('_apimgmt').getVariable('requested-grant-type');
 
 
                   if (grantType === 'implicit') {
                     // regression in 5070 will not allow access, and modification to the location header
-                    var location = apim.getvariable('oidc-location') + '&id_token=' + apim.getvariable("idtoken");
+                    let location = apim.getvariable('oidc-location') + '&id_token=' + apim.getvariable("idtoken");
                     // work around is to use xslt
                     apim.setvariable('oidc-location', location);
                   }
 
                   else {
                     if (apim.getvariable('oidc-location') !== undefined && apim.getvariable('oidc-location').indexOf('code=') !== -1) {
-                      var location = apim.getvariable('oidc-location') + '&id_token=' + apim.getvariable("idtoken");
+                      let location = apim.getvariable('oidc-location') + '&id_token=' + apim.getvariable("idtoken");
                       apim.setvariable('oidc-location', location);
                     }
                     else {
-                      var token = apim.getvariable("message.body");
+                      let token = apim.getvariable("message.body");
                       token["id_token"] = apim.getvariable("idtoken");
                       apim.setvariable("message.body", JSON.stringify(token));
                     }
